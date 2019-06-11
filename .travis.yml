@@ -26,6 +26,7 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN # set in the Travis dashboard
   local_dir: docs/build/html
+  keep_history: true
 
 notifications:
   email:
