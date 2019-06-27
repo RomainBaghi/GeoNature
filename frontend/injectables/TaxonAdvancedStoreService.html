@@ -1,0 +1,837 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>geonature documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">geonature documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Injectables</li>
+  <li>TaxonAdvancedStoreService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts</code>
+        </p>
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#formBuilded">formBuilded</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxhubAttributes">taxhubAttributes</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxonomyGroup2Inpn">taxonomyGroup2Inpn</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxonomyHab">taxonomyHab</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxonomyLR">taxonomyLR</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxonTree">taxonTree</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#taxonTreeState">taxonTreeState</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#treeModel">treeModel</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#formatTaxonTree">formatTaxonTree</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(_dataService: <a href="../injectables/DataFormService.html">DataFormService</a>, _syntheseDateService: <a href="../injectables/DataService.html">DataService</a>, _formService: <a href="../injectables/SyntheseFormService.html">SyntheseFormService</a>, _formGen: <a href="../injectables/DynamicFormService.html">DynamicFormService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:18</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>_dataService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DataFormService.html" target="_self" >DataFormService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>_syntheseDateService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DataService.html" target="_self" >DataService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>_formService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/SyntheseFormService.html" target="_self" >SyntheseFormService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>_formGen</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/DynamicFormService.html" target="_self" >DynamicFormService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="formatTaxonTree"></a>
+                    <span class="name">
+                        <b>
+                            formatTaxonTree
+                        </b>
+                        <a href="#formatTaxonTree"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>formatTaxonTree(taxonTree)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="80"
+                            class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:80</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>taxonTree</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+            <section>
+    
+        <h3 id="inputs">
+            Properties
+        </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="formBuilded"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            formBuilded</b>
+                            <a href="#formBuilded"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:15</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxhubAttributes"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxhubAttributes</b>
+                            <a href="#taxhubAttributes"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:14</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxonomyGroup2Inpn"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxonomyGroup2Inpn</b>
+                            <a href="#taxonomyGroup2Inpn"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>Array&lt;any&gt;</code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:18</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxonomyHab"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxonomyHab</b>
+                            <a href="#taxonomyHab"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>Array&lt;any&gt;</code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:17</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxonomyLR"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxonomyLR</b>
+                            <a href="#taxonomyLR"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>Array&lt;any&gt;</code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:16</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxonTree"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxonTree</b>
+                            <a href="#taxonTree"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:11</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="taxonTreeState"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            taxonTreeState</b>
+                            <a href="#taxonTreeState"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:13</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="treeModel"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            treeModel</b>
+                            <a href="#treeModel"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>TreeModel</code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:12</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+import { DataFormService } from &#x27;@geonature_common/form/data-form.service&#x27;;
+import { AppConfig } from &#x27;@geonature_config/app.config&#x27;;
+import { DataService } from &#x27;../../services/data.service&#x27;;
+import { SyntheseFormService } from &#x27;../../services/form.service&#x27;;
+import { DynamicFormService } from &#x27;@geonature_common/form/dynamic-form/dynamic-form.service&#x27;;
+import { TreeModel } from &#x27;angular-tree-component&#x27;;
+
+@Injectable()
+export class TaxonAdvancedStoreService {
+  public taxonTree: any;
+  public treeModel: TreeModel;
+  public taxonTreeState: any;
+  public taxhubAttributes: any;
+  public formBuilded: boolean;
+  public taxonomyLR: Array&lt;any&gt;;
+  public taxonomyHab: Array&lt;any&gt;;
+  public taxonomyGroup2Inpn: Array&lt;any&gt;;
+
+  constructor(
+    private _dataService: DataFormService,
+    private _syntheseDateService: DataService,
+    private _formService: SyntheseFormService,
+    private _formGen: DynamicFormService
+  ) {
+    if (AppConfig.SYNTHESE.DISPLAY_TAXON_TREE) {
+      this._syntheseDateService.getTaxonTree().subscribe(data &#x3D;&gt; {
+        this.taxonTree &#x3D; this.formatTaxonTree(data);
+      });
+    }
+
+    // get taxhub attributes
+    this._dataService.getTaxhubBibAttributes().subscribe(attrs &#x3D;&gt; {
+      // display only the taxhub attributes set in the config
+      this.taxhubAttributes &#x3D; attrs
+        .filter(attr &#x3D;&gt; {
+          return AppConfig.SYNTHESE.ID_ATTRIBUT_TAXHUB.indexOf(attr.id_attribut) !&#x3D;&#x3D; -1;
+        })
+        .map(attr &#x3D;&gt; {
+          // format attributes to fit with the GeoNature dynamicFormComponent
+          attr[&#x27;values&#x27;] &#x3D; JSON.parse(attr[&#x27;liste_valeur_attribut&#x27;]).values;
+          attr[&#x27;attribut_name&#x27;] &#x3D; &#x27;taxhub_attribut_&#x27; + attr[&#x27;id_attribut&#x27;];
+          attr[&#x27;required&#x27;] &#x3D; attr[&#x27;obligatoire&#x27;];
+          attr[&#x27;attribut_label&#x27;] &#x3D; attr[&#x27;label_attribut&#x27;];
+          if (attr[&#x27;type_widget&#x27;] &#x3D;&#x3D; &#x27;multiselect&#x27;) {
+            attr[&#x27;values&#x27;] &#x3D; attr[&#x27;values&#x27;].map(val &#x3D;&gt; {
+              return { value: val };
+            });
+          }
+          this._formGen.addNewControl(attr, this._formService.searchForm);
+
+          return attr;
+        });
+      this.formBuilded &#x3D; true;
+    });
+    // load LR,  habitat and group2inpn
+    this._dataService.getTaxonomyLR().subscribe(data &#x3D;&gt; {
+      this.taxonomyLR &#x3D; data;
+    });
+
+    this._dataService.getTaxonomyHabitat().subscribe(data &#x3D;&gt; {
+      this.taxonomyHab &#x3D; data;
+    });
+
+    const all_groups &#x3D; [];
+    this._dataService.getRegneAndGroup2Inpn().subscribe(data &#x3D;&gt; {
+      this.taxonomyGroup2Inpn &#x3D; data;
+      // tslint:disable-next-line:forin
+      for (let regne in data) {
+        data[regne].forEach(group &#x3D;&gt; {
+          if (group.length &gt; 0) {
+            all_groups.push({ value: group });
+          }
+        });
+      }
+      this.taxonomyGroup2Inpn &#x3D; all_groups;
+    });
+  }
+
+  formatTaxonTree(taxonTree) {
+    const formattedTree &#x3D; [];
+    let childrensRegne &#x3D; [];
+    let childrensEmbranchement &#x3D; [];
+    let childrensClasse &#x3D; [];
+    let childrensOrdre &#x3D; [];
+    let childrensFamille &#x3D; [];
+    let kd &#x3D; null;
+    let emb &#x3D; null;
+    let cl &#x3D; null;
+    let desc_cl &#x3D; null;
+    let ord &#x3D; null;
+    let fam &#x3D; null;
+    let nouveauRegne &#x3D; false;
+    let nouvelEmbranchement &#x3D; false;
+    let nouvelleClasse &#x3D; false;
+    let nouvelOrdre &#x3D; false;
+    let nouvelleFamille &#x3D; false;
+    let child &#x3D; {};
+    let regne &#x3D; {};
+    let embranchement &#x3D; {};
+    let classe &#x3D; {};
+    let ordre &#x3D; {};
+    let famille &#x3D; {};
+
+    //on bouble sur les enregistrements du store des taxons issu de la base
+    taxonTree.forEach(record &#x3D;&gt; {
+      if (kd &#x3D;&#x3D;&#x3D; null) {
+        kd &#x3D; record.nom_regne;
+      } //initialisation
+      if (emb &#x3D;&#x3D;&#x3D; null) {
+        emb &#x3D; record.nom_embranchement;
+      } //initialisation
+      if (cl &#x3D;&#x3D;&#x3D; null) {
+        cl &#x3D; record.nom_classe;
+      } //initialisation
+      if (desc_cl &#x3D;&#x3D;&#x3D; null) {
+        desc_cl &#x3D; record.desc_classe;
+      } //initialisation
+      if (ord &#x3D;&#x3D;&#x3D; null) {
+        ord &#x3D; record.nom_ordre;
+      } //initialisation
+      if (fam &#x3D;&#x3D;&#x3D; null) {
+        fam &#x3D; record.nom_famille;
+      } //initialisation
+      if (kd !&#x3D;&#x3D; record.nom_regne) {
+        nouveauRegne &#x3D; true;
+      } // si on a changé de niveau de règne
+      if (emb !&#x3D;&#x3D; record.nom_embranchement) {
+        nouvelEmbranchement &#x3D; true;
+      } // si on a changé de niveau d&#x27;embranchement
+      if (cl !&#x3D;&#x3D; record.nom_classe) {
+        nouvelleClasse &#x3D; true;
+      } // si on a changé de niveau de classe
+      if (ord !&#x3D;&#x3D; record.nom_ordre) {
+        nouvelOrdre &#x3D; true;
+      } // si on a changé de niveau d&#x27;ordre
+      if (fam !&#x3D;&#x3D; record.nom_famille) {
+        nouvelleFamille &#x3D; true;
+      } // si on a changé de niveau de famille
+
+      //création d&#x27;un noeud final avec checkbox
+      child &#x3D; {
+        id: record.cd_ref,
+        name: record.nom_latin + &#x27; - &#x27; + record.nom_francais,
+        classes: [&#x27;leaf&#x27;],
+        leaf: true,
+        checked: false
+      };
+      if (nouvelleFamille) {
+        //on crée le groupe
+        famille &#x3D; {
+          name: fam,
+          checked: false,
+          children: childrensFamille
+        };
+        childrensOrdre.push(famille); //on ajoute ce groupe à l&#x27;arbre
+        nouvelleFamille &#x3D; false; //on repasse à false pour les prochains tests
+        childrensFamille &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
+      }
+      if (nouvelOrdre) {
+        //on crée le groupe
+        ordre &#x3D; {
+          name: ord,
+          checked: false,
+          children: childrensOrdre
+        };
+        childrensClasse.push(ordre); //on ajoute ce groupe à l&#x27;arbre
+        nouvelOrdre &#x3D; false; //on repasse à false pour les prochains tests
+        childrensOrdre &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
+      }
+      if (nouvelleClasse) {
+        //on crée le groupe
+        classe &#x3D; {
+          name: cl + &#x27; - &#x27; + desc_cl,
+          checked: false,
+          children: childrensClasse
+        };
+        childrensEmbranchement.push(classe); //on ajoute ce groupe à l&#x27;arbre
+        nouvelleClasse &#x3D; false; //on repasse à false pour les prochains tests
+        childrensClasse &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
+      }
+      if (nouvelEmbranchement) {
+        //on crée le groupe
+        embranchement &#x3D; {
+          name: emb,
+          checked: false,
+          children: childrensEmbranchement
+        };
+        childrensRegne.push(embranchement); //on ajoute ce groupe à l&#x27;arbre
+        nouvelEmbranchement &#x3D; false; //on repasse à false pour les prochains tests
+        childrensEmbranchement &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
+      }
+      if (nouveauRegne) {
+        //on crée le groupe
+        regne &#x3D; {
+          name: kd,
+          checked: false,
+          children: childrensRegne
+        };
+        formattedTree.push(regne); //on ajoute ce groupe à l&#x27;arbre
+        nouveauRegne &#x3D; false; //on repasse à false pour les prochains tests
+        childrensRegne &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
+      }
+      childrensFamille.push(child); //ajout du noeud au groupe
+      kd &#x3D; record.nom_regne; //kd prend la valeur en cours du groupe pour un nouveau test en début de boucle
+      emb &#x3D; record.nom_embranchement; //emb prend la valeur en cours du groupe pour un nouveau test en début de boucle
+      cl &#x3D; record.nom_classe; //cl prend la valeur en cours du groupe pour un nouveau test en début de boucle
+      desc_cl &#x3D; record.desc_classe; //
+      ord &#x3D; record.nom_ordre; //ord prend la valeur en cours du groupe pour un nouveau test en début de boucle
+      fam &#x3D; record.nom_famille; //fam prend la valeur en cours du groupe pour un nouveau test en début de boucle
+    }); //fin de la boucle
+
+    //ajout du dernier groupe après la fin de la dernière boucle
+    famille &#x3D; {
+      name: fam,
+      checked: false,
+      children: childrensFamille
+    };
+    ordre &#x3D; {
+      name: ord,
+      checked: false,
+      children: childrensOrdre
+    };
+    classe &#x3D; {
+      name: cl + &#x27; - &#x27; + desc_cl,
+      checked: false,
+      children: childrensClasse
+    };
+    embranchement &#x3D; {
+      name: emb,
+      checked: false,
+      children: childrensEmbranchement
+    };
+    regne &#x3D; {
+      name: kd,
+      checked: false,
+      children: childrensRegne
+    };
+    childrensOrdre.push(famille);
+    childrensClasse.push(ordre);
+    childrensEmbranchement.push(classe);
+    childrensRegne.push(embranchement);
+    formattedTree.push(regne);
+    return formattedTree;
+  }
+}
+</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'TaxonAdvancedStoreService.html';
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

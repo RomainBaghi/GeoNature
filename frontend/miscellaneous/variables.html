@@ -1,0 +1,745 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>geonature documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">geonature documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content miscellaneous-variables">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Miscellaneous</li>
+  <li>Variables</li>
+</ol>
+
+<section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <ul class="index-list">
+                        <li>
+                            <a href="#AppConfig" title="src/conf/app.config.ts"><b>AppConfig</b>&nbsp;&nbsp;&nbsp;(src/.../app.config.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#DYNAMIC_FORM_DEF" title="src/app/syntheseModule/services/dynamycFormConfig.ts"><b>DYNAMIC_FORM_DEF</b>&nbsp;&nbsp;&nbsp;(src/.../dynamycFormConfig.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#environment" title="src/environments/environment.prod.ts"><b>environment</b>&nbsp;&nbsp;&nbsp;(src/.../environment.prod.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#environment" title="src/environments/environment.ts"><b>environment</b>&nbsp;&nbsp;&nbsp;(src/.../environment.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#FormatMapMime" title="src/app/syntheseModule/services/data.service.ts"><b>FormatMapMime</b>&nbsp;&nbsp;&nbsp;(src/.../data.service.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#FormatMapMime" title="src/app/GN2CommonModule/others/modal-download/modal-download.component.ts"><b>FormatMapMime</b>&nbsp;&nbsp;&nbsp;(src/.../modal-download.component.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#leafletDrawOption" title="src/app/GN2CommonModule/map/leaflet-draw.options.ts"><b>leafletDrawOption</b>&nbsp;&nbsp;&nbsp;(src/.../leaflet-draw.options.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#routing" title="src/app/routing/app-routing.module.ts"><b>routing</b>&nbsp;&nbsp;&nbsp;(src/.../app-routing.module.ts)</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    <h3>src/conf/app.config.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="AppConfig"></a>
+                        <span class="name">
+                            <b>
+                            AppConfig</b>
+                            <a href="#AppConfig"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/object" target="_blank" >object</a></code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>{
+ &quot;MTD_API_ENDPOINT&quot;: &quot;https://preprod-inpn.mnhn.fr/mtd&quot;,
+ &quot;SYNTHESE&quot;: {
+  &quot;EXPORT_GEOJSON_4326_COL&quot;: &quot;geojson_4326&quot;,
+  &quot;EXPORT_ID_DATASET_COL&quot;: &quot;jddId&quot;,
+  &quot;TAXON_RESULT_NUMBER&quot;: 20,
+  &quot;LIST_COLUMNS_FRONTEND&quot;: [
+   {
+    &quot;name&quot;: &quot;Taxon&quot;,
+    &quot;prop&quot;: &quot;nom_vern_or_lb_nom&quot;,
+    &quot;max_width&quot;: 200
+   },
+   {
+    &quot;name&quot;: &quot;Date obs&quot;,
+    &quot;prop&quot;: &quot;date_min&quot;,
+    &quot;max_width&quot;: 100
+   },
+   {
+    &quot;name&quot;: &quot;JDD&quot;,
+    &quot;prop&quot;: &quot;dataset_name&quot;,
+    &quot;max_width&quot;: 200
+   },
+   {
+    &quot;name&quot;: &quot;observateur&quot;,
+    &quot;prop&quot;: &quot;observers&quot;,
+    &quot;max_width&quot;: 200
+   }
+  ],
+  &quot;NB_LAST_OBS&quot;: 100,
+  &quot;EXPORT_COLUMNS&quot;: [
+   &quot;idSynthese&quot;,
+   &quot;permId&quot;,
+   &quot;permIdGrp&quot;,
+   &quot;dateDebut&quot;,
+   &quot;dateFin&quot;,
+   &quot;observer&quot;,
+   &quot;altMin&quot;,
+   &quot;altMax&quot;,
+   &quot;denbrMin&quot;,
+   &quot;denbrMax&quot;,
+   &quot;EchanPreuv&quot;,
+   &quot;PreuvNum&quot;,
+   &quot;PreuvNoNum&quot;,
+   &quot;obsCtx&quot;,
+   &quot;obsDescr&quot;,
+   &quot;ObjGeoTyp&quot;,
+   &quot;methGrp&quot;,
+   &quot;obsMeth&quot;,
+   &quot;ocEtatBio&quot;,
+   &quot;ocStatBio&quot;,
+   &quot;ocNat&quot;,
+   &quot;preuveOui&quot;,
+   &quot;validStat&quot;,
+   &quot;difNivPrec&quot;,
+   &quot;ocStade&quot;,
+   &quot;ocSex&quot;,
+   &quot;objDenbr&quot;,
+   &quot;denbrTyp&quot;,
+   &quot;sensiNiv&quot;,
+   &quot;statObs&quot;,
+   &quot;dEEFlou&quot;,
+   &quot;statSource&quot;,
+   &quot;typInfGeo&quot;,
+   &quot;methDeterm&quot;,
+   &quot;jddCode&quot;,
+   &quot;cdNom&quot;,
+   &quot;cdRef&quot;,
+   &quot;nomCite&quot;,
+   &quot;vTAXREF&quot;,
+   &quot;wkt&quot;,
+   &quot;lastAction&quot;,
+   &quot;validateur&quot;
+  ],
+  &quot;NB_MAX_OBS_MAP&quot;: 50000,
+  &quot;AREA_FILTERS&quot;: [
+   {
+    &quot;id_type&quot;: 25,
+    &quot;label&quot;: &quot;Communes&quot;
+   }
+  ],
+  &quot;EXPORT_ID_DIGITISER_COL&quot;: &quot;id_digitiser&quot;,
+  &quot;COLUMNS_API_SYNTHESE_WEB_APP&quot;: [
+   &quot;id_synthese&quot;,
+   &quot;date_min&quot;,
+   &quot;observers&quot;,
+   &quot;nom_valide&quot;,
+   &quot;dataset_name&quot;
+  ],
+  &quot;EXPORT_OBSERVERS_COL&quot;: &quot;observer&quot;,
+  &quot;DISPLAY_TAXON_TREE&quot;: true,
+  &quot;CRUVED_SEARCH_WITH_OBSERVER_AS_TXT&quot;: false,
+  &quot;NB_MAX_OBS_EXPORT&quot;: 50000,
+  &quot;EXPORT_FORMAT&quot;: [
+   &quot;csv&quot;,
+   &quot;geojson&quot;,
+   &quot;shapefile&quot;
+  ],
+  &quot;EXPORT_ID_SYNTHESE_COL&quot;: &quot;idSynthese&quot;,
+  &quot;EXPORT_METADATA_ACTOR_COL&quot;: &quot;acteurs&quot;,
+  &quot;ID_ATTRIBUT_TAXHUB&quot;: [
+   102,
+   103
+  ],
+  &quot;EXPORT_GEOJSON_LOCAL_COL&quot;: &quot;geojson_local&quot;,
+  &quot;EXCLUDED_COLUMNS&quot;: [],
+  &quot;EXPORT_METADATA_ID_DATASET_COL&quot;: &quot;jdd_id&quot;,
+  &quot;ENABLE_LEAFLET_CLUSTER&quot;: true
+ },
+ &quot;ENABLE_NOMENCLATURE_TAXONOMIC_FILTERS&quot;: true,
+ &quot;GEONATURE_VERSION&quot;: &quot;2.1.0-dev0&quot;,
+ &quot;API_TAXHUB&quot;: &quot;http://127.0.0.1:5000&quot;,
+ &quot;DEFAULT_LANGUAGE&quot;: &quot;fr&quot;,
+ &quot;API_ENDPOINT&quot;: &quot;http://127.0.0.1:8000&quot;,
+ &quot;ID_APPLICATION_GEONATURE&quot;: 3,
+ &quot;appName&quot;: &quot;GeoNature2&quot;,
+ &quot;URL_APPLICATION&quot;: &quot;http://test.ecrins-parcnational.net/geonature&quot;,
+ &quot;PASS_METHOD&quot;: &quot;hash&quot;,
+ &quot;LOCAL_SRID&quot;: 2154,
+ &quot;FRONTEND&quot;: {
+  &quot;MULTILINGUAL&quot;: false,
+  &quot;DISPLAY_FOOTER&quot;: true,
+  &quot;PROD_MOD&quot;: true,
+  &quot;DISPLAY_STAT_BLOC&quot;: true,
+  &quot;DISPLAY_MAP_LAST_OBS&quot;: true
+ },
+ &quot;RIGHTS&quot;: {
+  &quot;MY_DATA&quot;: 1,
+  &quot;NOTHING&quot;: 0,
+  &quot;ALL_DATA&quot;: 3,
+  &quot;MY_ORGANISM_DATA&quot;: 2
+ },
+ &quot;DEBUG&quot;: false,
+ &quot;MAPCONFIG&quot;: {
+  &quot;ZOOM_ON_CLICK&quot;: 18,
+  &quot;ZOOM_LEVEL_RELEVE&quot;: 15,
+  &quot;BASEMAP&quot;: [
+   {
+    &quot;name&quot;: &quot;OpenStreetMap&quot;,
+    &quot;layer&quot;: &quot;//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png&quot;,
+    &quot;attribution&quot;: &quot;&amp;copy OpenStreetMap&quot;
+   },
+   {
+    &quot;name&quot;: &quot;OpenTopoMap&quot;,
+    &quot;layer&quot;: &quot;//a.tile.opentopomap.org/{z}/{x}/{y}.png&quot;,
+    &quot;attribution&quot;: &quot;\u00a9 OpenTopoMap&quot;
+   },
+   {
+    &quot;name&quot;: &quot;GoogleSatellite&quot;,
+    &quot;subdomains&quot;: [
+     &quot;mt0&quot;,
+     &quot;mt1&quot;,
+     &quot;mt2&quot;,
+     &quot;mt3&quot;
+    ],
+    &quot;layer&quot;: &quot;//{s}.google.com/vt/lyrs&#x3D;s&amp;x&#x3D;{x}&amp;y&#x3D;{y}&amp;z&#x3D;{z}&quot;,
+    &quot;attribution&quot;: &quot;\u00a9 GoogleMap&quot;
+   }
+  ],
+  &quot;ZOOM_LEVEL&quot;: 6,
+  &quot;CENTER&quot;: [
+   46.52863469527167,
+   2.43896484375
+  ]
+ },
+ &quot;BDD&quot;: {
+  &quot;ID_USER_SOCLE_2&quot;: 6,
+  &quot;id_area_type_municipality&quot;: 25,
+  &quot;ID_USER_SOCLE_1&quot;: 8
+ },
+ &quot;XML_NAMESPACE&quot;: &quot;{http://inpn.mnhn.fr/mtd}&quot;,
+ &quot;CAS_PUBLIC&quot;: {
+  &quot;CAS_URL_LOGIN&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/login&quot;,
+  &quot;CAS_AUTHENTIFICATION&quot;: false,
+  &quot;CAS_URL_LOGOUT&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/logout&quot;
+ }
+}</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/syntheseModule/services/dynamycFormConfig.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="DYNAMIC_FORM_DEF"></a>
+                        <span class="name">
+                            <b>
+                            DYNAMIC_FORM_DEF</b>
+                            <a href="#DYNAMIC_FORM_DEF"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Technique d&#x27;observation&quot;,
+    attribut_name: &#x27;id_nomenclature_obs_technique&#x27;,
+    code_nomenclature_type: &#x27;TECHNIQUE_OBS&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Type de regroupement&#x27;,
+    attribut_name: &#x27;id_nomenclature_grp_typ&#x27;,
+    code_nomenclature_type: &#x27;TYP_GRP&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Statut d&#x27;observation&quot;,
+    attribut_name: &#x27;id_nomenclature_observation_status&#x27;,
+    code_nomenclature_type: &#x27;STATUT_OBS&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Méthode d&#x27;observation&quot;,
+    attribut_name: &#x27;id_nomenclature_obs_meth&#x27;,
+    code_nomenclature_type: &#x27;METH_OBS&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Etat biologique&#x27;,
+    attribut_name: &#x27;id_nomenclature_bio_condition&#x27;,
+    code_nomenclature_type: &#x27;ETA_BIO&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Statut biologique&#x27;,
+    attribut_name: &#x27;id_nomenclature_bio_status&#x27;,
+    code_nomenclature_type: &#x27;STATUT_BIO&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Naturalité&#x27;,
+    attribut_name: &#x27;id_nomenclature_naturalness&#x27;,
+    code_nomenclature_type: &#x27;NATURALITE&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Méthode de détermination&#x27;,
+    attribut_name: &#x27;id_nomenclature_determination_method&#x27;,
+    code_nomenclature_type: &#x27;METH_DETERMIN&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Preuve d&#x27;existence&quot;,
+    attribut_name: &#x27;id_nomenclature_exist_proof&#x27;,
+    code_nomenclature_type: &#x27;PREUVE_EXIST&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Niveau de diffusion&#x27;,
+    attribut_name: &#x27;id_nomenclature_diffusion_level&#x27;,
+    code_nomenclature_type: &#x27;NIV_PRECIS&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Statut source&#x27;,
+    attribut_name: &#x27;id_nomenclature_source_status&#x27;,
+    code_nomenclature_type: &#x27;STATUT_SOURCE&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Floutage&#x27;,
+    attribut_name: &#x27;id_nomenclature_blurring&#x27;,
+    code_nomenclature_type: &#x27;DEE_FLOU&#x27;,
+    required: false,
+    multi_select: true
+  },
+  // counting
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Stade de vie&#x27;,
+    attribut_name: &#x27;id_nomenclature_life_stage&#x27;,
+    code_nomenclature_type: &#x27;STADE_VIE&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Sexe&#x27;,
+    attribut_name: &#x27;id_nomenclature_sex&#x27;,
+    code_nomenclature_type: &#x27;SEXE&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Objet du dénombrement&#x27;,
+    attribut_name: &#x27;id_nomenclature_obj_count&#x27;,
+    code_nomenclature_type: &#x27;OBJ_DENBR&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Type de dénombrement&#x27;,
+    attribut_name: &#x27;id_nomenclature_type_count&#x27;,
+    code_nomenclature_type: &#x27;TYP_DENBR&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Statut de validation&#x27;,
+    attribut_name: &#x27;id_nomenclature_valid_status&#x27;,
+    code_nomenclature_type: &#x27;STATUT_VALID&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Type d&#x27;objet géographique&quot;,
+    attribut_name: &#x27;id_nomenclature_geo_object_nature&#x27;,
+    code_nomenclature_type: &#x27;NAT_OBJ_GEO&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &#x27;Sensibilité&#x27;,
+    attribut_name: &#x27;id_nomenclature_sensitivity&#x27;,
+    code_nomenclature_type: &#x27;SENSIBILITE&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;nomenclature&#x27;,
+    attribut_label: &quot;Type d&#x27;information géographique&quot;,
+    attribut_name: &#x27;id_nomenclature_sensitivity&#x27;,
+    code_nomenclature_type: &#x27;TYP_INF_GEO&#x27;,
+    required: false,
+    multi_select: true
+  },
+  {
+    type_widget: &#x27;text&#x27;,
+    attribut_label: &#x27;Preuve numérique&#x27;,
+    attribut_name: &#x27;digital_proof&#x27;,
+    required: false
+  },
+  {
+    type_widget: &#x27;text&#x27;,
+    attribut_label: &#x27;Preuve non numérique&#x27;,
+    attribut_name: &#x27;non_digital_proof&#x27;,
+    required: false
+  }
+]</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/environments/environment.prod.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="environment"></a>
+                        <span class="name">
+                            <b>
+                            environment</b>
+                            <a href="#environment"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/object" target="_blank" >object</a></code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>{
+  production: true
+}</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/environments/environment.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="environment"></a>
+                        <span class="name">
+                            <b>
+                            environment</b>
+                            <a href="#environment"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/object" target="_blank" >object</a></code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>{
+  production: false
+}</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/syntheseModule/services/data.service.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="FormatMapMime"></a>
+                        <span class="name">
+                            <b>
+                            FormatMapMime</b>
+                            <a href="#FormatMapMime"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>new Map([
+  [&#x27;csv&#x27;, &#x27;text/csv&#x27;],
+  [&#x27;json&#x27;, &#x27;application/json&#x27;],
+  [&#x27;shp&#x27;, &#x27;application/zip&#x27;]
+])</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/GN2CommonModule/others/modal-download/modal-download.component.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="FormatMapMime"></a>
+                        <span class="name">
+                            <b>
+                            FormatMapMime</b>
+                            <a href="#FormatMapMime"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>new Map([
+  [&#x27;csv&#x27;, &#x27;text/csv&#x27;],
+  [&#x27;json&#x27;, &#x27;application/json&#x27;],
+  [&#x27;shp&#x27;, &#x27;application/zip&#x27;]
+])</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/GN2CommonModule/map/leaflet-draw.options.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="leafletDrawOption"></a>
+                        <span class="name">
+                            <b>
+                            leafletDrawOption</b>
+                            <a href="#leafletDrawOption"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>{
+  position: &#x27;topleft&#x27;,
+  draw: {
+    polyline: true,
+    circle: false, // Turns off this drawing tool
+    circlemarker: false,
+    rectangle: false,
+    marker: false,
+    polygon: {
+      allowIntersection: false, // Restricts shapes to simple polygons
+      drawError: {
+        color: &#x27;#e1e100&#x27;, // Color the shape will turn when intersects
+        message: &#x27;Intersection forbidden !&#x27; // Message that will show when intersect
+      },
+    },
+
+  },
+  edit: {
+    remove: false,
+    moveMarker: true
+  }
+}</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/routing/app-routing.module.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="routing"></a>
+                        <span class="name">
+                            <b>
+                            routing</b>
+                            <a href="#routing"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>RouterModule.forRoot(defaultRoutes, {useHash: true })</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'miscellaneous-variables';
+            var COMPODOC_CURRENT_PAGE_URL = 'variables.html';
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
