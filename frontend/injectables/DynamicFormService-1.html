@@ -56,7 +56,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/app/GN2CommonModule/form/dynamic-form/dynamic-form.service.ts</code>
+            <code>src/app/GN2CommonModule/form/dynamic-form-generator/dynamic-form.service.ts</code>
         </p>
 
 
@@ -107,7 +107,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="5" class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form/dynamic-form.service.ts:5</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="5" class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form-generator/dynamic-form.service.ts:5</a></div>
                             </td>
                         </tr>
 
@@ -142,8 +142,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="30"
-                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form/dynamic-form.service.ts:30</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="31"
+                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form-generator/dynamic-form.service.ts:31</a></div>
                 </td>
             </tr>
 
@@ -224,7 +224,7 @@
             <tr>
                 <td class="col-md-4">
                     <div class="io-line">Defined in <a href="" data-line="16"
-                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form/dynamic-form.service.ts:16</a></div>
+                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form-generator/dynamic-form.service.ts:16</a></div>
                 </td>
             </tr>
 
@@ -290,7 +290,7 @@
             <tr>
                 <td class="col-md-4">
                     <div class="io-line">Defined in <a href="" data-line="8"
-                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form/dynamic-form.service.ts:8</a></div>
+                            class="link-to-prism">src/app/GN2CommonModule/form/dynamic-form-generator/dynamic-form.service.ts:8</a></div>
                 </td>
             </tr>
 
@@ -344,16 +344,16 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
-import { FormControl, FormArray, FormGroup, Validators, AbstractControl } from &#x27;@angular/forms&#x27;;
+import { FormControl, FormGroup, Validators, AbstractControl } from &#x27;@angular/forms&#x27;;
 
 @Injectable()
 export class DynamicFormService {
-  constructor() { }
+  constructor() {}
 
   toFormGroup(formsDef: Array&lt;any&gt;) {
-    const group: any &#x3D; {};
+    let group: any &#x3D; {};
     formsDef.forEach(form &#x3D;&gt; {
-      group[form.attribut_name] &#x3D; this.createControl(form);
+      group[form.nom_attribut] &#x3D; this.createControl(form);
     });
     return new FormGroup(group);
   }
@@ -361,7 +361,7 @@ export class DynamicFormService {
   createControl(formDef): AbstractControl {
     let abstractForm;
     if (formDef.type_widget &#x3D;&#x3D;&#x3D; &#x27;checkbox&#x27;) {
-      abstractForm &#x3D; formDef.required
+      abstractForm &#x3D; formDef.obligatoire
         ? new FormControl([], Validators.required)
         : new FormControl([]);
     } else {
@@ -369,6 +369,7 @@ export class DynamicFormService {
         ? new FormControl(formDef.value || null, Validators.required)
         : new FormControl(formDef.value || null);
     }
+
     return abstractForm;
   }
 

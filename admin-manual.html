@@ -111,6 +111,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#fonctions">Fonctions :</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tables-transversales">Tables transversales :</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#triggers-vers-la-synthese">Triggers vers la synthèse :</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#triggers-dans-la-synthese">Triggers dans la synthèse :</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#modularite">Modularité</a></li>
@@ -163,6 +164,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#id3">Configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-validation">Module VALIDATION</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="import-level-1.html">IMPORT NIVEAU 1</a></li>
@@ -470,30 +472,126 @@ d’une observation avec tous les zonages</td>
 </div>
 <div class="section" id="tables-transversales">
 <h3>Tables transversales :<a class="headerlink" href="#tables-transversales" title="Permalink to this headline">¶</a></h3>
-<p>GeoNature contient aussi des tables de stockage transversales qui peuvent être utilisées par tous les modules. C’est le cas pour la validation, l’historisation des modifications et médias.</p>
+<p>GeoNature contient aussi des tables de stockage transversales qui peuvent être utilisées par tous les modules. C’est le cas pour la validation, la sensibilité, l’historisation des modifications et les médias.</p>
 <p>Cela permet de ne pas avoir à mettre en place des tables et mécanismes dans chaque module, mais de s’appuyer sur un stockage, des fonctions et développements factorisés, centralisés et partagés.</p>
+<p>Ces tables utilisent notamment le mécanisme des UUID (identifiant unique) pour retrouver les enregistrements. Depuis une table source (Occtax ou un autre module) on peut retrouver les enregistrments stockées dans les table transversale en utilisant un <code class="docutils literal"><span class="pre">WHERE</span> <span class="pre">&lt;TABLE_TRANSVERSALE&gt;.uuid_attached_row</span> <span class="pre">=</span> <span class="pre">&lt;MON_UUID_SOURCE&gt;</span></code> et ainsi retrouver l’historique de validation, les médias ou encore la sensibilité associé à une donnée.</p>
 <p>Voir <a class="reference external" href="https://github.com/PnX-SI/GeoNature/issues/339">https://github.com/PnX-SI/GeoNature/issues/339</a></p>
 </div>
 <div class="section" id="triggers-vers-la-synthese">
 <h3>Triggers vers la synthèse :<a class="headerlink" href="#triggers-vers-la-synthese" title="Permalink to this headline">¶</a></h3>
 <p>Voir ceux mis en place de Occtax vers Synthèse.</p>
 <p>Cheminement d’une donnée Occtax :</p>
-<dl class="docutils">
-<dt>-&gt; Formulaire Occtax</dt>
-<dd><dl class="first last docutils">
-<dt>-&gt; Ecriture dans la table <code class="docutils literal"><span class="pre">cor_counting_occtax</span></code> et génération d’un nouvel UUID</dt>
-<dd><dl class="first last docutils">
-<dt>-&gt; Trigger d’écriture dans la table verticale <code class="docutils literal"><span class="pre">t_validations</span></code> à partir de la valeur par défaut de la nomenclature de validation (<code class="docutils literal"><span class="pre">gn_common.ref_nomenclatures.defaults_nomenclatures_value</span></code>)</dt>
-<dd><dl class="first last docutils">
-<dt>-&gt; Trigger d’écriture d’Occtax vers la synthese (on ne maitrise pas l’ordre de ces 2 triggers qui sont lancés en même temps)</dt>
-<dd>-&gt; Trigger de rapatriement du dernier statut de validation de la table verticale vers la synthese.</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
+<ol class="arabic simple">
+<li>Formulaire Occtax</li>
+<li>Ecriture dans la table <code class="docutils literal"><span class="pre">cor_counting_occtax</span></code> et génération d’un nouvel UUID</li>
+<li>Trigger d’écriture dans la table verticale <code class="docutils literal"><span class="pre">t_validations</span></code> à partir de la valeur par défaut de la nomenclature de validation (<code class="docutils literal"><span class="pre">gn_common.ref_nomenclatures.defaults_nomenclatures_value</span></code>)</li>
+<li>Trigger d’écriture d’Occtax vers la synthese (on ne maitrise pas l’ordre de ces 2 triggers qui sont lancés en même temps)</li>
+<li>Trigger de rapatriement du dernier statut de validation de la table verticale vers la synthese.</li>
+</ol>
+</div>
+<div class="section" id="triggers-dans-la-synthese">
+<h3>Triggers dans la synthèse :<a class="headerlink" href="#triggers-dans-la-synthese" title="Permalink to this headline">¶</a></h3>
+<p>Version 2.1.0 de GeoNature</p>
+<img alt="https://geonature.fr/docs/img/2019-06-triggers-gn_synthese.jpg" src="https://geonature.fr/docs/img/2019-06-triggers-gn_synthese.jpg" />
+<p><strong>Table&nbsp;: synthese</strong></p>
+<p>Table contenant l’ensemble des données.
+Respecte le standard Occurrence de taxon du SINP.</p>
+<ul class="simple">
+<li>tri_meta_dates_change_synthese<ul>
+<li>BEFORE INSERT OR UPDATE</li>
+<li>Mise à jour des champs <code class="docutils literal"><span class="pre">meta_create_date</span></code> et <code class="docutils literal"><span class="pre">meta_update_date</span></code></li>
+</ul>
+</li>
+<li>trg_refresh_taxons_forautocomplete<ul>
+<li>AFTER INSERT OR UPDATE OF cd_nom OR DELETE</li>
+<li>Mise à jour de la table <code class="docutils literal"><span class="pre">taxons_synthese_autocomplete</span></code></li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Si suppression ou update&nbsp;: suppression des enregistrements avec le cd_nom concerné dans la table <code class="docutils literal"><span class="pre">gn_synthese.taxons_synthese_autocomplete</span> <span class="pre">auto</span></code>. <em>Si un cd_nom est présent dans plusieurs enregistrements, il sera supprimé également. Il manque un test pour savoir si la suppression doit ou non être activée.</em></li>
+<li>Insertion des informations taxonomiques du cd_nom concerné dans la table <code class="docutils literal"><span class="pre">gn_synthese.taxons_synthese_autocomplete</span> <span class="pre">auto</span></code></li>
+</ol>
+</li>
+</ul>
+</li>
+<li>tri_insert_cor_area_synthese<ul>
+<li>AFTER INSERT OR UPDATE OF the_geom_local</li>
+<li>Mise à jour de la table <code class="docutils literal"><span class="pre">cor_area_synthese</span></code></li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Si update&nbsp;: suppression des enregistrements de la table <code class="docutils literal"><span class="pre">gn_synthese.cor_area_synthese</span></code> avec l’id_synthese concerné</li>
+<li>Insertion des id_areas intersectant la géométrie de la synthèse dans <code class="docutils literal"><span class="pre">gn_synthese.cor_area_synthese</span></code>. <em>Prise en compte de toutes les aires qu’elles soient ou non actives. Manque enable = true</em></li>
+</ol>
+</li>
+</ul>
+</li>
+<li>tri_del_area_synt_maj_corarea_tax<ul>
+<li>BEFORE DELETE</li>
+<li>Mise à jour des tables <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> et <code class="docutils literal"><span class="pre">cor_area_synthese</span></code></li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Récupération de l’ensemble des aires intersectant la donnée de synthèse</li>
+<li>Suppression des enregistrement de <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> avec le cd_nom et les aires concernés</li>
+<li>Insertion dans <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> recalculant les max, nb_obs et couleur pour chaque aire pour l’ensemble des données avec les aires concernées et le cd_nom concerné ne correspondant pas à la donnée supprimée</li>
+<li>Suppression des enregistrements de gn_synthese.cor_area_synthese</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>tri_update_cor_area_taxon_update_cd_nom<ul>
+<li>AFTER UPDATE OF cd_nom</li>
+<li>Mise à jour de la table cor_area_taxon</li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Récupération de l’ensemble des aires intersectant la donnée de synthèse</li>
+<li>Recalcul <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> pour l’ancien cd_nom via fonction <code class="docutils literal"><span class="pre">gn_synthese.delete_and_insert_area_taxon</span></code></li>
+<li>Recalcul <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> pour le nouveau cd_nom via fonction <code class="docutils literal"><span class="pre">gn_synthese.delete_and_insert_area_taxon</span></code></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Table&nbsp;: cor_area_synthese</strong></p>
+<p>Table contenant l’ensemble des id_areas intersectant les enregistrements de la synthèse</p>
+<ul class="simple">
+<li>tri_maj_cor_area_taxon<ul>
+<li>AFTER INSERT OR UPDATE</li>
+<li>Mise à jour des données de cor_area_taxon</li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Récupération du cd_nom en lien avec l’enregistrement <code class="docutils literal"><span class="pre">cor_area_synthese</span></code></li>
+<li>Suppression des données de <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> avec le <code class="docutils literal"><span class="pre">cd_nom</span></code> et <code class="docutils literal"><span class="pre">id_area</span></code> concerné</li>
+<li>Insertion des données dans <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> en lien avec le <code class="docutils literal"><span class="pre">cd_nom</span></code> et <code class="docutils literal"><span class="pre">id_area</span></code></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Table&nbsp;: cor_observer_synthese</strong></p>
+<ul class="simple">
+<li>trg_maj_synthese_observers_txt<ul>
+<li>AFTER INSERT OR UPDATE OR DELETE</li>
+<li>Mise à jour du champ <code class="docutils literal"><span class="pre">observers</span></code> de la table <code class="docutils literal"><span class="pre">synthese</span></code></li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Construction de la valeur textuelle des observateurs</li>
+<li>Mise à jour du champ observer de l’enregistrement de la table <code class="docutils literal"><span class="pre">synthese</span></code></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>FONCTIONS</strong></p>
+<ul class="simple">
+<li>delete_and_insert_area_taxon<ul>
+<li>Fonction qui met à jour la table <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> en fonction d’un <code class="docutils literal"><span class="pre">cd_nom</span></code> et d’une liste d’<code class="docutils literal"><span class="pre">id</span> <span class="pre">area</span></code></li>
+<li>Actions&nbsp;:<ol class="arabic">
+<li>Suppression des enregistrement de la table <code class="docutils literal"><span class="pre">cor_area_taxon</span></code> avec le <code class="docutils literal"><span class="pre">cd_nom</span></code> et les <code class="docutils literal"><span class="pre">id_area</span></code> concernés</li>
+<li>Insertion des données dans <code class="docutils literal"><span class="pre">cor_area_taxon</span></code></li>
+</ol>
+</li>
+</ul>
+</li>
+<li>color_taxon<ul>
+<li>Fonction qui associe une couleur à une durée</li>
+<li><em>Passer les couleurs en paramètres&nbsp;: table  gn_commons.t_parameters&nbsp;?</em></li>
+<li><em>Passer la fonction en immutable</em></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 <div class="section" id="modularite">
@@ -521,9 +619,9 @@ d’une observation avec tous les zonages</td>
 <p>Il est possible de le compléter en surcouchant les paramètres présents dans le fichier <code class="docutils literal"><span class="pre">config/default_config.toml.example</span></code>.</p>
 <p>A chaque modification du fichier global de configuration (<code class="docutils literal"><span class="pre">&lt;GEONATURE_DIRECTORY&gt;/config/geonature_config.toml</span></code>), il faut regénérer le fichier de configuration du frontend.</p>
 <p>Ainsi après chaque modification des fichiers de configuration globale, placez-vous dans le backend de GeoNature (<code class="docutils literal"><span class="pre">/home/monuser/GeoNature/backend</span></code>) et lancez les commandes :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
-<span class="n">geonature</span> <span class="n">update_configuration</span>
-<span class="n">deactivate</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">source venv/bin/activate</span>
+<span class="go">geonature update_configuration</span>
+<span class="go">deactivate</span>
 </pre></div>
 </div>
 </div>
@@ -532,9 +630,9 @@ d’une observation avec tous les zonages</td>
 <p>Lors de l’installation d’un module, un fichier de configuration est créé : <code class="docutils literal"><span class="pre">&lt;MODULE_DIRECTORY&gt;/config/conf_gn_module.toml</span></code>.</p>
 <p>Comme pour la configuration globale, ce fichier est minimaliste et peut être surcouché. Le fichier <code class="docutils literal"><span class="pre">conf_gn_module.toml.example</span></code>, situé dans le répertoire <code class="docutils literal"><span class="pre">config</span></code> du module, décrit l’ensemble des variables de configuration disponibles ainsi que leurs valeurs par défaut.</p>
 <p>A chaque modification de ce fichier, lancer les commandes suivantes depuis le backend de GeoNature (<code class="docutils literal"><span class="pre">/home/monuser/GeoNature/backend</span></code>). Le fichier est copié à destination du frontend <code class="docutils literal"><span class="pre">&lt;nom_module&gt;/frontend/app/module.config.ts</span></code>, qui est alors recompilé automatiquement.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
-<span class="n">geonature</span> <span class="n">update_module_configuration</span> <span class="o">&lt;</span><span class="n">NOM_DE_MODULE</span><span class="o">&gt;</span>
-<span class="n">deactivate</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">source venv/bin/activate</span>
+<span class="go">geonature update_module_configuration &lt;NOM_DE_MODULE&gt;</span>
+<span class="go">deactivate</span>
 </pre></div>
 </div>
 </div>
@@ -558,8 +656,8 @@ d’une observation avec tous les zonages</td>
 <h3>Commandes GeoNature<a class="headerlink" href="#commandes-geonature" title="Permalink to this headline">¶</a></h3>
 <p>GeoNature est fourni avec une série de commandes pour administrer l’application.
 Pour les exécuter, il est nécessaire d’être dans le virtualenv python de GeoNature</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">&lt;</span><span class="n">GEONATURE_DIRECTORY</span><span class="o">&gt;/</span><span class="n">backend</span>
-<span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd &lt;GEONATURE_DIRECTORY&gt;/backend</span>
+<span class="go">source venv/bin/activate</span>
 </pre></div>
 </div>
 <p>Le préfixe (venv) se met alors au début de votre invite de commande.</p>
@@ -587,15 +685,15 @@ Pour les exécuter, il est nécessaire d’être dans le virtualenv python de Ge
 <li>L’API de taxhub tourne sur le port 5000</li>
 </ul>
 <p>Pour vérifier que les API de GeoNature et de TaxHub sont lancées, exécuter la commande :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ps</span> <span class="o">-</span><span class="n">aux</span> <span class="o">|</span><span class="n">grep</span> <span class="n">gunicorn</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">ps -aux |grep gunicorn</span>
 </pre></div>
 </div>
 <p>La commande doit renvoyer 4 fois la ligne suivante pour GeoNature :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>root      27074  4.6  0.1  73356 23488 ?        S    17:35   0:00       /home/theo/workspace/GN2/GeoNature/backend/venv/bin/python3 /home/theo/workspace/GN2/GeoNature/backend/venv/bin/gunicorn wsgi:app --error-log /var/log/geonature/api_errors.log --pid=geonature2.pid -w 4 -b 0.0.0.0:8000 -n geonature2
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">root      27074  4.6  0.1  73356 23488 ?        S    17:35   0:00       /home/theo/workspace/GN2/GeoNature/backend/venv/bin/python3 /home/theo/workspace/GN2/GeoNature/backend/venv/bin/gunicorn wsgi:app --error-log /var/log/geonature/api_errors.log --pid=geonature2.pid -w 4 -b 0.0.0.0:8000 -n geonature2</span>
 </pre></div>
 </div>
 <p>et 4 fois la ligne suivante pour TaxHub :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>root      27103 10.0  0.3 546188 63328 ?        Sl   17:35   0:00 /home/theo/workspace/GN2/TaxHub/venv/bin/python3.5 /home/theo/workspace/GN2/TaxHub/venv/bin/gunicorn server:app --access-logfile /var/log/taxhub/taxhub-access.log --error-log /var/log/taxhub/taxhub-errors.log --pid=taxhub.pid -w 4 -b 0.0.0.0:5000 -n taxhub
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">root      27103 10.0  0.3 546188 63328 ?        Sl   17:35   0:00 /home/theo/workspace/GN2/TaxHub/venv/bin/python3.5 /home/theo/workspace/GN2/TaxHub/venv/bin/gunicorn server:app --access-logfile /var/log/taxhub/taxhub-access.log --error-log /var/log/taxhub/taxhub-errors.log --pid=taxhub.pid -w 4 -b 0.0.0.0:5000 -n taxhub</span>
 </pre></div>
 </div>
 <p>Chaque ligne correspond à un worker Gunicorn.</p>
@@ -623,7 +721,7 @@ Pour les exécuter, il est nécessaire d’être dans le virtualenv python de Ge
 <li>TaxHub : <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">supervisorctl</span> <span class="pre">stop</span> <span class="pre">taxhub</span></code></li>
 </ul>
 <p>Pour redémarer les API :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">supervisorctl</span> <span class="n">reload</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo supervisorctl reload</span>
 </pre></div>
 </div>
 </div>
@@ -631,15 +729,15 @@ Pour les exécuter, il est nécessaire d’être dans le virtualenv python de Ge
 <h3>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h3>
 <p>Lors d’une opération de maintenance (montée en version, modification de la base de données…), vous pouvez rendre l’application momentanémment indisponible.</p>
 <p>Pour cela, désactivez la configuration Apache de GeoNature, puis activez la configuration du mode de maintenance :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">a2dissite</span> <span class="n">geonature</span>
-<span class="n">sudo</span> <span class="n">a2ensite</span> <span class="n">geonature_maintenance</span>
-<span class="n">sudo</span> <span class="n">apachectl</span> <span class="n">restart</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo a2dissite geonature</span>
+<span class="go">sudo a2ensite geonature_maintenance</span>
+<span class="go">sudo apachectl restart</span>
 </pre></div>
 </div>
 <p>A la fin de l’opération de maintenance, effectuer la manipulation inverse :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">a2dissite</span> <span class="n">geonature_maintenance</span>
-<span class="n">sudo</span> <span class="n">a2ensite</span> <span class="n">geonature</span>
-<span class="n">sudo</span> <span class="n">apachectl</span> <span class="n">restart</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo a2dissite geonature_maintenance</span>
+<span class="go">sudo a2ensite geonature</span>
+<span class="go">sudo apachectl restart</span>
 </pre></div>
 </div>
 <p>Attention : ne pas stopper le backend (des opérations en BDD en cours pourraient être corrompues)</p>
@@ -659,7 +757,7 @@ Pour les exécuter, il est nécessaire d’être dans le virtualenv python de Ge
 <li>Sauvegarde de la base de données :</li>
 </ul>
 <p>Les sauvegardes de la BDD sont à faire avec l’utilisateur <code class="docutils literal"><span class="pre">postgres</span></code>. Commencer par créer un répertoire et lui donner des droits sur le répertoire où seront faites les sauvegardes.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span># Créer le répertoire pour stocker les sauvegardes
+<div class="highlight-console"><div class="highlight"><pre><span></span># Créer le répertoire pour stocker les sauvegardes
 mkdir /home/`whoami`/backup
 # Ajouter l&#39;utilisateur postgres au groupe de l&#39;utilisateur linux courant pour qu&#39;il ait les droits d&#39;écrire dans les mêmes répertoires
 sudo adduser postgres `whoami`
@@ -668,18 +766,18 @@ chmod g+rwx /home/`whoami`/backup
 </pre></div>
 </div>
 <p>Connectez-vous avec l’utilisateur linux <code class="docutils literal"><span class="pre">postgres</span></code> pour lancer une sauvegarde de la BDD :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>sudo su postgres
-pg_dump -Fc geonature2db  &gt; backup/`date +%Y-%m-%d-%H:%M`-geonaturedb.backup
-exit
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo su postgres</span>
+<span class="go">pg_dump -Fc geonature2db  &gt; backup/`date +%Y-%m-%d-%H:%M`-geonaturedb.backup</span>
+<span class="go">exit</span>
 </pre></div>
 </div>
 <p>Si la sauvegarde ne se fait pas, c’est qu’il faut revoir les droits du répertoire où sont faites les sauvegardes pour que l’utilisateur <code class="docutils literal"><span class="pre">postgres</span></code> puisse y écrire</p>
 <p>Opération à faire régulièrement grâce à une tâche cron.</p>
 <ul>
 <li><p class="first">Sauvegarde des fichiers de configuration :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd geonature/config
-tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-geonature_config.tar.gz ./
-cd /home/&lt;MY_USER&gt;/geonature
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd geonature/config</span>
+<span class="go">tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-geonature_config.tar.gz ./</span>
+<span class="go">cd /home/&lt;MY_USER&gt;/geonature</span>
 </pre></div>
 </div>
 </li>
@@ -687,8 +785,8 @@ cd /home/&lt;MY_USER&gt;/geonature
 <p>Opération à faire à chaque modification d’un paramètre de configuration.</p>
 <ul>
 <li><p class="first">Sauvegarde des fichiers de customisation :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/&lt;MY_USER&gt;geonature/frontend/src/custom
-tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-geonature_custom.tar.gz ./
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/&lt;MY_USER&gt;geonature/frontend/src/custom</span>
+<span class="go">tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-geonature_custom.tar.gz ./</span>
 </pre></div>
 </div>
 </li>
@@ -696,8 +794,8 @@ tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-geonature_custom.t
 <p>Opération à faire à chaque modification de la customisation de l’application.</p>
 <ul>
 <li><p class="first">Sauvegarde des modules externes :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/&lt;MY_USER&gt;geonature/external_modules
-tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.tar.gz ./
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/&lt;MY_USER&gt;geonature/external_modules</span>
+<span class="go">tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.tar.gz ./</span>
 </pre></div>
 </div>
 </li>
@@ -709,18 +807,18 @@ tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.t
 <li><p class="first">Restauration de la base de données :</p>
 <ul>
 <li><p class="first">Créer une base de données vierge (on part du principe que la base de données <code class="docutils literal"><span class="pre">geonature2db</span></code> n’existe pas ou plus). Sinon adaptez le nom de la BDD et également la configuration de connexion de l’application à la BDD dans <code class="docutils literal"><span class="pre">&lt;GEONATURE_DIRECTORY&gt;/config/geonature_config.toml</span></code></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">createdb</span> <span class="o">-</span><span class="n">O</span> <span class="o">&lt;</span><span class="n">MON_USER</span><span class="o">&gt;</span> <span class="n">geonature2db</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE EXTENSION IF NOT EXISTS postgis;&quot;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE EXTENSION IF NOT EXISTS hstore;&quot;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog; COMMENT ON EXTENSION plpgsql IS &#39;PL/pgSQL procedural language&#39;;&quot;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;CREATE EXTENSION IF NOT EXISTS &quot;uuid-ossp&quot;;&#39;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE EXTENSION IF NOT EXISTS pg_trgm;&quot;</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo -n -u postgres -s createdb -O &lt;MON_USER&gt; geonature2db</span>
+<span class="go">sudo -n -u postgres -s psql -d geonature2db -c &quot;CREATE EXTENSION IF NOT EXISTS postgis;&quot;</span>
+<span class="go">sudo -n -u postgres -s psql -d geonature2db -c &quot;CREATE EXTENSION IF NOT EXISTS hstore;&quot;</span>
+<span class="go">sudo -n -u postgres -s psql -d geonature2db -c &quot;CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog; COMMENT ON EXTENSION plpgsql IS &#39;PL/pgSQL procedural language&#39;;&quot;</span>
+<span class="go">sudo -n -u postgres -s psql -d geonature2db -c &#39;CREATE EXTENSION IF NOT EXISTS &quot;uuid-ossp&quot;;&#39;</span>
+<span class="go">sudo -n -u postgres -s psql -d geonature2db -c &quot;CREATE EXTENSION IF NOT EXISTS pg_trgm;&quot;</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">Restaurer la BDD à partir du backup</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">su</span> <span class="n">postgres</span>
-<span class="n">pg_restore</span> <span class="o">-</span><span class="n">d</span> <span class="n">geonature2db</span> <span class="o">&lt;</span><span class="n">MY_BACKUP_DIRECTORY_PATH</span><span class="o">&gt;/</span><span class="mi">201803150917</span><span class="o">-</span><span class="n">geonaturedb</span><span class="o">.</span><span class="n">backup</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo su postgres</span>
+<span class="go">pg_restore -d geonature2db &lt;MY_BACKUP_DIRECTORY_PATH&gt;/201803150917-geonaturedb.backup</span>
 </pre></div>
 </div>
 </li>
@@ -729,26 +827,26 @@ tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.t
 <li><p class="first">Restauration de la configuration et de la customisation :</p>
 <ul>
 <li><p class="first">Décomprésser les fichiers précedemment sauvegardés pour les remettre au bon emplacement :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">rm</span> <span class="o">&lt;</span><span class="n">GEONATURE_DIRECTORY</span><span class="o">&gt;/</span><span class="n">config</span><span class="o">/*</span>
-<span class="n">cd</span> <span class="o">&lt;</span><span class="n">GEONATURE_DIRECTORY</span><span class="o">&gt;/</span><span class="n">config</span>
-<span class="n">sudo</span> <span class="n">tar</span> <span class="o">-</span><span class="n">zxvf</span> <span class="o">&lt;</span><span class="n">MY_BACKUP_DIRECTORY</span><span class="o">&gt;/</span><span class="mi">201803150953</span><span class="o">-</span><span class="n">geonature_config</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo rm &lt;GEONATURE_DIRECTORY&gt;/config/*</span>
+<span class="go">cd &lt;GEONATURE_DIRECTORY&gt;/config</span>
+<span class="go">sudo tar -zxvf &lt;MY_BACKUP_DIRECTORY&gt;/201803150953-geonature_config.tar.gz</span>
 
-<span class="n">cd</span> <span class="o">/</span><span class="n">home</span><span class="o">/&lt;</span><span class="n">MY_USER</span><span class="o">&gt;/</span><span class="n">geonature</span><span class="o">/</span><span class="n">frontend</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">custom</span>
-<span class="n">rm</span> <span class="o">-</span><span class="n">r</span> <span class="o">&lt;</span><span class="n">MY_USER</span><span class="o">&gt;/</span><span class="n">geonature</span><span class="o">/</span><span class="n">frontend</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">custom</span><span class="o">/*</span>
-<span class="n">tar</span> <span class="o">-</span><span class="n">zxvf</span> <span class="o">&lt;</span><span class="n">MY_BACKUP_DIRECTORY</span><span class="o">&gt;/</span><span class="mi">201803150953</span><span class="o">-</span><span class="n">geonature_custom</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+<span class="go">cd /home/&lt;MY_USER&gt;/geonature/frontend/src/custom</span>
+<span class="go">rm -r &lt;MY_USER&gt;/geonature/frontend/src/custom/*</span>
+<span class="go">tar -zxvf &lt;MY_BACKUP_DIRECTORY&gt;/201803150953-geonature_custom.tar.gz</span>
 
-<span class="n">rm</span> <span class="o">/</span><span class="n">home</span><span class="o">/&lt;</span><span class="n">MY_USER</span><span class="o">&gt;/</span><span class="n">geonature</span><span class="o">/</span><span class="n">external_modules</span><span class="o">/*</span>
-<span class="n">cd</span> <span class="o">&lt;</span><span class="n">GEONATURE_DIRECTORY</span><span class="o">&gt;/</span><span class="n">external_modules</span>
-<span class="n">tar</span> <span class="o">-</span><span class="n">zxvf</span> <span class="o">&lt;</span><span class="n">MY_BACKUP_DIRECTORY</span><span class="o">&gt;/</span><span class="mi">201803151036</span><span class="o">-</span><span class="n">external_modules</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+<span class="go">rm /home/&lt;MY_USER&gt;/geonature/external_modules/*</span>
+<span class="go">cd &lt;GEONATURE_DIRECTORY&gt;/external_modules</span>
+<span class="go">tar -zxvf &lt;MY_BACKUP_DIRECTORY&gt;/201803151036-external_modules.tar.gz</span>
 </pre></div>
 </div>
 </li>
 </ul>
 </li>
 <li><p class="first">Relancer l’application :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/&lt;</span><span class="n">MY_USER</span><span class="o">&gt;/</span><span class="n">geonature</span><span class="o">/</span><span class="n">frontend</span>
-<span class="n">npm</span> <span class="n">run</span> <span class="n">build</span>
-<span class="n">sudo</span> <span class="n">supervisorctl</span> <span class="n">reload</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /&lt;MY_USER&gt;/geonature/frontend</span>
+<span class="go">npm run build</span>
+<span class="go">sudo supervisorctl reload</span>
 </pre></div>
 </div>
 </li>
@@ -759,7 +857,7 @@ tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.t
 <h2>Customisation<a class="headerlink" href="#customisation" title="Permalink to this headline">¶</a></h2>
 <p>La customisation de l’application nécessite de relancer la compilation du frontend à chaque modification. Cette opération étant relativement longue, une solution alternative (mais avancée) consiste à passer le frontend de manière temporaire en mode ‘developpement’.</p>
 <p>Pour cela exécuter la commande suivante depuis le répertoire <code class="docutils literal"><span class="pre">frontend</span></code></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">run</span> <span class="n">start</span> <span class="o">--</span> <span class="o">--</span><span class="n">host</span><span class="o">=</span><span class="mf">0.0</span><span class="o">.</span><span class="mf">0.0</span> <span class="o">--</span><span class="n">disable</span><span class="o">-</span><span class="n">host</span><span class="o">-</span><span class="n">check</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">npm run start -- --host=0.0.0.0 --disable-host-check</span>
 </pre></div>
 </div>
 <p>L’application est désormais disponible sur une serveur de développement à la même addresse que précedemment, mais sur le port 4200 : <a class="reference external" href="http://test.geonature.fr:4200">http://test.geonature.fr:4200</a></p>
@@ -778,8 +876,8 @@ tar -zcvf &lt;MY_BACKUP_DIRECTORY_PATH&gt;/`date +%Y%m%d%H%M`-external_modules.t
 </pre></div>
 </div>
 <p>Relancez la construction de l’interface :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/`whoami`/geonature/frontend
-npm run build
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/`whoami`/geonature/frontend</span>
+<span class="go">npm run build</span>
 </pre></div>
 </div>
 </div>
@@ -791,8 +889,8 @@ npm run build
 <p>Le texte d’introduction et le titre de la page d’Accueil de GeoNature peuvent être modifiés à tout moment, sans réinstallation de l’application. Il en est de même pour le bouton d’accès à la synthèse.</p>
 <p>Il suffit pour cela de mettre à jour le fichier <code class="docutils literal"><span class="pre">introduction.component.html</span></code>, situé dans le répertoire <code class="docutils literal"><span class="pre">geonature/frontend/src/custom/components/introduction</span></code>.</p>
 <p>Afin que ces modifications soient prises en compte dans l’interface, il est nécessaire de relancer les commandes suivantes :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/`whoami`/geonature/frontend
-npm run build
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/`whoami`/geonature/frontend</span>
+<span class="go">npm run build</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -800,8 +898,8 @@ npm run build
 </ul>
 <p>Le pied de page peut être customisé de la même manière, en renseignant le fichier <code class="docutils literal"><span class="pre">footer.component.html</span></code>, situé dans le répertoire <code class="docutils literal"><span class="pre">geonature/frontend/src/custom/components/footer</span></code></p>
 <p>De la même manière, il est nécessaire de relancer les commandes suivantes pour que les modifications soient prises en compte :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/`whoami`/geonature/frontend
-npm run build
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/`whoami`/geonature/frontend</span>
+<span class="go">npm run build</span>
 </pre></div>
 </div>
 </div>
@@ -809,17 +907,17 @@ npm run build
 <h3>Customiser l’aspect esthétique<a class="headerlink" href="#customiser-l-aspect-esthetique" title="Permalink to this headline">¶</a></h3>
 <p>Les couleurs de textes, couleurs de fonds, forme des boutons etc peuvent être adaptés en renseignant le fichier <code class="docutils literal"><span class="pre">custom.scss</span></code>, situé dans le répertoire <code class="docutils literal"><span class="pre">geonature/frontend/src/custom</span></code>.</p>
 <p>Pour remplacer la couleur de fond du bandeau de navigation par une image, on peut par exemple apporter la modification suivante :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span> <span class="n">html</span> <span class="n">body</span> <span class="n">pnx</span><span class="o">-</span><span class="n">root</span> <span class="n">pnx</span><span class="o">-</span><span class="n">nav</span><span class="o">-</span><span class="n">home</span> <span class="n">mat</span><span class="o">-</span><span class="n">sidenav</span><span class="o">-</span><span class="n">container</span><span class="o">.</span><span class="n">sidenav</span><span class="o">-</span><span class="n">container</span><span class="o">.</span><span class="n">mat</span><span class="o">-</span><span class="n">drawer</span><span class="o">-</span><span class="n">container</span><span class="o">.</span><span class="n">mat</span><span class="o">-</span><span class="n">sidenav</span><span class="o">-</span><span class="n">container</span> <span class="n">mat</span><span class="o">-</span><span class="n">sidenav</span><span class="o">-</span><span class="n">content</span><span class="o">.</span><span class="n">mat</span><span class="o">-</span><span class="n">drawer</span><span class="o">-</span><span class="n">content</span><span class="o">.</span><span class="n">mat</span><span class="o">-</span><span class="n">sidenav</span><span class="o">-</span><span class="n">content</span> <span class="n">mat</span><span class="o">-</span><span class="n">toolbar</span><span class="c1">#app-toolbar.row.mat-toolbar</span>
+<div class="highlight-css"><div class="highlight"><pre><span></span> <span class="nt">html</span> <span class="nt">body</span> <span class="nt">pnx-root</span> <span class="nt">pnx-nav-home</span> <span class="nt">mat-sidenav-container</span><span class="p">.</span><span class="nc">sidenav-container</span><span class="p">.</span><span class="nc">mat-drawer-container</span><span class="p">.</span><span class="nc">mat-sidenav-container</span> <span class="nt">mat-sidenav-content</span><span class="p">.</span><span class="nc">mat-drawer-content</span><span class="p">.</span><span class="nc">mat-sidenav-content</span> <span class="nt">mat-toolbar</span><span class="p">#</span><span class="nn">app-toolbar</span><span class="p">.</span><span class="nc">row</span><span class="p">.</span><span class="nc">mat-toolbar</span>
 <span class="p">{</span>
-   <span class="n">background</span> <span class="p">:</span>
-   <span class="n">url</span><span class="p">(</span><span class="n">bandeau_test</span><span class="o">.</span><span class="n">jpg</span><span class="p">)</span>
+   <span class="k">background</span> <span class="p">:</span>
+   <span class="nb">url</span><span class="p">(</span><span class="sx">bandeau_test.jpg</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Dans ce cas, l’image <code class="docutils literal"><span class="pre">bandeau_test.jpg</span></code> doit se trouver dans le répertoire <code class="docutils literal"><span class="pre">&gt;geonature/frontend/src</span></code> .</p>
 <p>Comme pour la modification des contenus, il est nécessaire de relancer la commande suivante pour que les modifications soient prises en compte :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd /home/`whoami`/geonature/frontend
-npm run build
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd /home/`whoami`/geonature/frontend</span>
+<span class="go">npm run build</span>
 </pre></div>
 </div>
 </div>
@@ -838,25 +936,25 @@ npm run build
 <p><em>TODO : Procédure à améliorer et simplifier : https://github.com/PnX-SI/GeoNature/issues/235</em></p>
 <p>Si vous n’avez pas choisi d’intégrer le raster MNT national à 250m fourni par défaut lors de l’installation ou que vous souhaitez le remplacer, voici les commandes qui vous permettront de le faire.</p>
 <p>Suppression du MNT par défaut (adapter le nom de la base de données : MYDBNAME).</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;TRUNCATE TABLE ref_geo.dem;&quot;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;TRUNCATE TABLE ref_geo.dem_vector;&quot;</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo -n -u postgres -s psql -d MYDBNAME -c &quot;TRUNCATE TABLE ref_geo.dem;&quot;</span>
+<span class="go">sudo -n -u postgres -s psql -d MYDBNAME -c &quot;TRUNCATE TABLE ref_geo.dem_vector;&quot;</span>
 </pre></div>
 </div>
 <p>Placer votre propre fichier MNT (ou vos différents fichiers “dalles”) dans le répertoire <code class="docutils literal"><span class="pre">/tmp/geonature</span></code> (adapter le nom du fichier et son chemin ainsi que les paramètres en majuscule).</p>
 <p>Pour utiliser celui proposé par défaut :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="o">--</span><span class="n">cache</span><span class="o">=</span><span class="n">off</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">geonature</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ign</span><span class="o">/</span><span class="n">BDALTIV2_2</span><span class="o">-</span><span class="mi">0</span><span class="n">_250M_ASC_LAMB93</span><span class="o">-</span><span class="n">IGN69_FRANCE_2017</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mf">21.</span><span class="n">zip</span> <span class="o">-</span><span class="n">P</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">geonature</span>
-<span class="n">unzip</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">geonature</span><span class="o">/</span><span class="n">BDALTIV2_2</span><span class="o">-</span><span class="mi">0</span><span class="n">_250M_ASC_LAMB93</span><span class="o">-</span><span class="n">IGN69_FRANCE_2017</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mf">21.</span><span class="n">zip</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">geonature</span>
-<span class="n">export</span> <span class="n">PGPASSWORD</span><span class="o">=</span><span class="n">MYUSERPGPASS</span><span class="p">;</span><span class="n">raster2pgsql</span> <span class="o">-</span><span class="n">s</span> <span class="n">MYSRID</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span><span class="n">I</span> <span class="o">-</span><span class="n">M</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">t</span> <span class="mi">5</span><span class="n">x5</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">geonature</span><span class="o">/</span><span class="n">BDALTIV2_250M_FXX_0098_7150_MNT_LAMB93_IGN69</span><span class="o">.</span><span class="n">asc</span> <span class="n">ref_geo</span><span class="o">.</span><span class="n">dem</span><span class="o">|</span><span class="n">psql</span> <span class="o">-</span><span class="n">h</span> <span class="n">localhost</span> <span class="o">-</span><span class="n">U</span> <span class="n">MYPGUSER</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;REINDEX INDEX ref_geo.dem_st_convexhull_idx;&quot;</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">wget --cache=off http://geonature.fr/data/ign/BDALTIV2_2-0_250M_ASC_LAMB93-IGN69_FRANCE_2017-06-21.zip -P /tmp/geonature</span>
+<span class="go">unzip /tmp/geonature/BDALTIV2_2-0_250M_ASC_LAMB93-IGN69_FRANCE_2017-06-21.zip -d /tmp/geonature</span>
+<span class="go">export PGPASSWORD=MYUSERPGPASS;raster2pgsql -s MYSRID -c -C -I -M -d -t 5x5 /tmp/geonature/BDALTIV2_250M_FXX_0098_7150_MNT_LAMB93_IGN69.asc ref_geo.dem|psql -h localhost -U MYPGUSER -d MYDBNAME</span>
+<span class="go">sudo -n -u postgres -s psql -d MYDBNAME -c &quot;REINDEX INDEX ref_geo.dem_st_convexhull_idx;&quot;</span>
 </pre></div>
 </div>
 <p>Si votre MNT source est constitué de plusieurs fichiers (dalles), assurez vous que toutes vos dalles ont le même système de projection et le même format de fichier (tiff, asc, ou img par exemple). Après avoir chargé vos fichiers dans <code class="docutils literal"><span class="pre">tmp/geonature</span></code> (par exemple), vous pouvez lancer la commande <code class="docutils literal"><span class="pre">export</span></code> en remplacant le nom des fichiers par <a href="#id1"><span class="problematic" id="id2">*</span></a>.asc :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PGPASSWORD</span><span class="o">=</span><span class="n">MYUSERPGPASS</span><span class="p">;</span><span class="n">raster2pgsql</span> <span class="o">-</span><span class="n">s</span> <span class="n">MYSRID</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span><span class="n">I</span> <span class="o">-</span><span class="n">M</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">t</span> <span class="mi">5</span><span class="n">x5</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">geonature</span><span class="o">/*.</span><span class="n">asc</span> <span class="n">ref_geo</span><span class="o">.</span><span class="n">dem</span><span class="o">|</span><span class="n">psql</span> <span class="o">-</span><span class="n">h</span> <span class="n">localhost</span> <span class="o">-</span><span class="n">U</span> <span class="n">MYPGUSER</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">export PGPASSWORD=MYUSERPGPASS;raster2pgsql -s MYSRID -c -C -I -M -d -t 5x5 /tmp/geonature/*.asc ref_geo.dem|psql -h localhost -U MYPGUSER -d MYDBNAME</span>
 </pre></div>
 </div>
 <p>Si vous souhaitez vectoriser le raster MNT pour de meilleures performances lors des calculs en masse de l’altitude à partir de la localisation des observations, vous pouvez le faire en lançant les commandes ci-dessous. Sachez que cela prendra du temps et beaucoup d’espace disque (2.8Go supplémentaires environ pour le fichier DEM France à 250m).</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;INSERT INTO ref_geo.dem_vector (geom, val) SELECT (ST_DumpAsPolygons(rast)).* FROM ref_geo.dem;&quot;</span>
-<span class="n">sudo</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">s</span> <span class="n">psql</span> <span class="o">-</span><span class="n">d</span> <span class="n">MYDBNAME</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;REINDEX INDEX ref_geo.index_dem_vector_geom;&quot;</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo -n -u postgres -s psql -d MYDBNAME -c &quot;INSERT INTO ref_geo.dem_vector (geom, val) SELECT (ST_DumpAsPolygons(rast)).* FROM ref_geo.dem;&quot;</span>
+<span class="go">sudo -n -u postgres -s psql -d MYDBNAME -c &quot;REINDEX INDEX ref_geo.index_dem_vector_geom;&quot;</span>
 </pre></div>
 </div>
 <p>Si <code class="docutils literal"><span class="pre">ref_geo.dem_vector</span></code> est remplie, cette table est utilisée pour le calcul de l’altitude à la place de la table <code class="docutils literal"><span class="pre">ref_geo.dem</span></code></p>
@@ -900,8 +998,8 @@ npm run build
 <h3>Installer le module<a class="headerlink" href="#installer-le-module" title="Permalink to this headline">¶</a></h3>
 <p>Le module est fourni par défaut avec l’installation de GeoNature.</p>
 <p>Si vous l’avez supprimé, lancez les commandes suivantes depuis le repertoire <code class="docutils literal"><span class="pre">backend</span></code> de GeoNature</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
-<span class="n">geonature</span> <span class="n">install_gn_module</span> <span class="o">/</span><span class="n">home</span><span class="o">/&lt;</span><span class="n">mon_user</span><span class="o">&gt;/</span><span class="n">geonature</span><span class="o">/</span><span class="n">contrib</span><span class="o">/</span><span class="n">occtax</span> <span class="n">occtax</span>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">source venv/bin/activate</span>
+<span class="go">geonature install_gn_module /home/&lt;mon_user&gt;/geonature/contrib/occtax occtax</span>
 </pre></div>
 </div>
 </div>
@@ -965,17 +1063,17 @@ Il est possible de passer ce champ en texte libre en mettant à <code class="doc
 <p>Le paramètre <code class="docutils literal"><span class="pre">id_taxon_list</span> <span class="pre">=</span> <span class="pre">100</span></code> correspond à un ID de liste de la table <code class="docutils literal"><span class="pre">taxonomie.bib_listes</span></code> (L’ID 100 correspond à la liste “Saisie Occtax”). Vous pouvez changer ce paramètre avec l’ID de liste que vous souhaitez, ou bien garder cet ID et changer le contenu de cette liste.</p>
 <p>Voici les requêtes SQL pour remplir la liste 500 avec tous les taxons de Taxref à partir du rang <code class="docutils literal"><span class="pre">genre</span></code> :</p>
 <p>Il faut d’abord remplir la table <code class="docutils literal"><span class="pre">taxonomie.bib_noms</span></code> (table des taxons de sa structure), puis remplir la liste 500, avec l’ensemble des taxons de <code class="docutils literal"><span class="pre">bib_noms</span></code> :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DELETE</span> <span class="n">FROM</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">cor_nom_liste</span><span class="p">;</span>
-<span class="n">DELETE</span> <span class="n">FROM</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">bib_noms</span><span class="p">;</span>
+<div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">cor_nom_liste</span><span class="p">;</span>
+<span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">bib_noms</span><span class="p">;</span>
 
-<span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">bib_noms</span><span class="p">(</span><span class="n">cd_nom</span><span class="p">,</span><span class="n">cd_ref</span><span class="p">,</span><span class="n">nom_francais</span><span class="p">)</span>
-<span class="n">SELECT</span> <span class="n">cd_nom</span><span class="p">,</span> <span class="n">cd_ref</span><span class="p">,</span> <span class="n">nom_vern</span>
-<span class="n">FROM</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">taxref</span>
-<span class="n">WHERE</span> <span class="n">id_rang</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="s1">&#39;Dumm&#39;</span><span class="p">,</span><span class="s1">&#39;SPRG&#39;</span><span class="p">,</span><span class="s1">&#39;KD&#39;</span><span class="p">,</span><span class="s1">&#39;SSRG&#39;</span><span class="p">,</span><span class="s1">&#39;IFRG&#39;</span><span class="p">,</span><span class="s1">&#39;PH&#39;</span><span class="p">,</span><span class="s1">&#39;SBPH&#39;</span><span class="p">,</span><span class="s1">&#39;IFPH&#39;</span><span class="p">,</span><span class="s1">&#39;DV&#39;</span><span class="p">,</span><span class="s1">&#39;SBDV&#39;</span><span class="p">,</span><span class="s1">&#39;SPCL&#39;</span><span class="p">,</span><span class="s1">&#39;CLAD&#39;</span><span class="p">,</span><span class="s1">&#39;CL&#39;</span><span class="p">,</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">bib_noms</span><span class="p">(</span><span class="n">cd_nom</span><span class="p">,</span><span class="n">cd_ref</span><span class="p">,</span><span class="n">nom_francais</span><span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">cd_nom</span><span class="p">,</span> <span class="n">cd_ref</span><span class="p">,</span> <span class="n">nom_vern</span>
+<span class="k">FROM</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">taxref</span>
+<span class="k">WHERE</span> <span class="n">id_rang</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="s1">&#39;Dumm&#39;</span><span class="p">,</span><span class="s1">&#39;SPRG&#39;</span><span class="p">,</span><span class="s1">&#39;KD&#39;</span><span class="p">,</span><span class="s1">&#39;SSRG&#39;</span><span class="p">,</span><span class="s1">&#39;IFRG&#39;</span><span class="p">,</span><span class="s1">&#39;PH&#39;</span><span class="p">,</span><span class="s1">&#39;SBPH&#39;</span><span class="p">,</span><span class="s1">&#39;IFPH&#39;</span><span class="p">,</span><span class="s1">&#39;DV&#39;</span><span class="p">,</span><span class="s1">&#39;SBDV&#39;</span><span class="p">,</span><span class="s1">&#39;SPCL&#39;</span><span class="p">,</span><span class="s1">&#39;CLAD&#39;</span><span class="p">,</span><span class="s1">&#39;CL&#39;</span><span class="p">,</span>
   <span class="s1">&#39;SBCL&#39;</span><span class="p">,</span><span class="s1">&#39;IFCL&#39;</span><span class="p">,</span><span class="s1">&#39;LEG&#39;</span><span class="p">,</span><span class="s1">&#39;SPOR&#39;</span><span class="p">,</span><span class="s1">&#39;COH&#39;</span><span class="p">,</span><span class="s1">&#39;OR&#39;</span><span class="p">,</span><span class="s1">&#39;SBOR&#39;</span><span class="p">,</span><span class="s1">&#39;IFOR&#39;</span><span class="p">,</span><span class="s1">&#39;SPFM&#39;</span><span class="p">,</span><span class="s1">&#39;FM&#39;</span><span class="p">,</span><span class="s1">&#39;SBFM&#39;</span><span class="p">,</span><span class="s1">&#39;TR&#39;</span><span class="p">,</span><span class="s1">&#39;SSTR&#39;</span><span class="p">)</span>
 
-<span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">cor_nom_liste</span> <span class="p">(</span><span class="n">id_liste</span><span class="p">,</span><span class="n">id_nom</span><span class="p">)</span>
-<span class="n">SELECT</span> <span class="mi">100</span><span class="p">,</span><span class="n">n</span><span class="o">.</span><span class="n">id_nom</span> <span class="n">FROM</span> <span class="n">taxonomie</span><span class="o">.</span><span class="n">bib_noms</span> <span class="n">n</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">cor_nom_liste</span> <span class="p">(</span><span class="n">id_liste</span><span class="p">,</span><span class="n">id_nom</span><span class="p">)</span>
+<span class="k">SELECT</span> <span class="mi">100</span><span class="p">,</span><span class="n">n</span><span class="p">.</span><span class="n">id_nom</span> <span class="k">FROM</span> <span class="n">taxonomie</span><span class="p">.</span><span class="n">bib_noms</span> <span class="n">n</span>
 </pre></div>
 </div>
 <p>Il est également possible d’éditer des listes à partir de l’application TaxHub.</p>
@@ -993,7 +1091,7 @@ Il est possible de passer ce champ en texte libre en mettant à <code class="doc
 <p>Le mécanisme peut être poussé plus loin en associant une nomenclature par défaut par organisme, règne et group2_inpn.
 La valeur 0 pour ses champs revient à mettre la valeur par défaut pour tous les organismes, tous les règnes et tous les group2_inpn.</p>
 <p>Une interface de gestion des nomenclatures est prévue d’être développée pour simplifier cette configuration.</p>
-<p>TODO: valeur par défaut de la validation</p>
+<p>TODO : valeur par défaut de la validation</p>
 </div>
 <div class="section" id="personnaliser-l-interface-map-list">
 <h4>Personnaliser l’interface Map-list<a class="headerlink" href="#personnaliser-l-interface-map-list" title="Permalink to this headline">¶</a></h4>
@@ -1130,10 +1228,14 @@ Attention : Si des données sont déjà présentes dans la synthèse et que l’
     <span class="p">]</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">L’entête <code class="docutils literal"><span class="pre">[SYNTHESE]</span></code> au dessus <code class="docutils literal"><span class="pre">EXPORT_COLUMNS</span></code> indique simplement que cette variable appartient au bloc de configuration de la synthese. Ne pas rajouter l’entête à chaque paramètre de la synthese mais une seule fois au dessus de toutes les variables de configuration du module.</p>
-</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">L’entête <code class="docutils literal"><span class="pre">[SYNTHESE]</span></code> au dessus <code class="docutils literal"><span class="pre">EXPORT_COLUMNS</span></code> indique simplement que cette variable appartient au bloc de configuration de la synthese. Ne pas rajouter l’entête à chaque paramètre de la synthese mais une seule fois au dessus de toutes les variables de configuration du module.</td>
+</tr>
+</tbody>
+</table>
 <p>Il est également possible de personnaliser ses exports en éditant le SQL de la vue <code class="docutils literal"><span class="pre">gn_synthese.v_synthese_for_export</span></code> (niveau SQL et administration GeoNature avancé).</p>
 <p>Attention, certains champs sont cependant obligatoires pour assurer la réalisation des fichiers d’export (csv, geojson et shapefile) et des filtres CRUVED.</p>
 <p>La vue doit OBLIGATOIREMENT contenir les champs :</p>
@@ -1146,7 +1248,7 @@ Attention : Si des données sont déjà présentes dans la synthèse et que l’
 <li>observer</li>
 </ul>
 <p>Ces champs doivent impérativement être présents dans la vue, mais ne seront pas nécessairement dans le fichier d’export si ils ne figurent pas dans la variable <code class="docutils literal"><span class="pre">EXPORT_COLUMNS</span></code>. De manière générale, préférez rajouter des champs plutôt que d’en enlever !</p>
-<p>Le nom de ces champs peuvent cependant être modifié. Dans ce cas, modifiez le fichier <code class="docutils literal"><span class="pre">geonature_config.toml</span></code>, section <code class="docutils literal"><span class="pre">SYNTHESE</span></code> parmis les variables suivantes (<code class="docutils literal"><span class="pre">EXPORT_ID_SYNTHESE_COL,</span> <span class="pre">EXPORT_ID_DATASET_COL,</span> <span class="pre">EXPORT_ID_DIGITISER_COL,</span> <span class="pre">EXPORT_OBSERVERS_COL,</span> <span class="pre">EXPORT_GEOJSON_4326_COL,</span> <span class="pre">EXPORT_GEOJSON_LOCAL_COL</span></code>)</p>
+<p>Le nom de ces champs peuvent cependant être modifié. Dans ce cas, modifiez le fichier <code class="docutils literal"><span class="pre">geonature_config.toml</span></code>, section <code class="docutils literal"><span class="pre">SYNTHESE</span></code> parmis les variables suivantes (<code class="docutils literal"><span class="pre">EXPORT_ID_SYNTHESE_COL,</span> <span class="pre">EXPORT_ID_DATASET_COL,</span> <span class="pre">EXPORT_ID_DIGITISER_COL,</span> <span class="pre">EXPORT_OBSERVERS_COL,</span> <span class="pre">EXPORT_GEOJSON_4326_COL,</span> <span class="pre">EXPORT_GEOJSON_LOCAL_COL</span></code>).</p>
 <p>NB: Lorsqu’on effectue une recherche dans la synthèse, on interroge la vue <code class="docutils literal"><span class="pre">gn_synthese.v_synthese_for_web_app</span></code>. L’interface web passe ensuite une liste d’<code class="docutils literal"><span class="pre">id_synthese</span></code> à la vue <a href="#id4"><span class="problematic" id="id5">``</span></a>gn_synthese.v_synthese_for_export``correspondant à la recherche précedemment effectuée (ce qui permet à cette seconde vue d’être totalement modifiable).</p>
 <p>La vue <code class="docutils literal"><span class="pre">gn_synthese.v_synthese_for_web_app</span></code> est taillée pour l’interface web, il ne faut donc PAS la modifier.</p>
 <p><strong>Export des métadonnées</strong></p>
@@ -1179,6 +1281,15 @@ Attention : Si des données sont déjà présentes dans la synthèse et que l’
 <p>D’autres élements sont paramètrables dans le module synthese. La liste complète est disponible dans le fichier <code class="docutils literal"><span class="pre">config/geonature_config.toml</span></code> rubrique <code class="docutils literal"><span class="pre">SYNTHESE</span></code>.</p>
 </div>
 </div>
+<div class="section" id="module-validation">
+<h2>Module VALIDATION<a class="headerlink" href="#module-validation" title="Permalink to this headline">¶</a></h2>
+<p>Le module VALIDATION, integré depuis la version 2.1.0 dans le coeur de GeoNature permet de valider des occurrences de taxon en s’appuyant sur les données présentes dans la SYNTHESE. Le module s’appuie sur le <a class="reference external" href="http://www.naturefrance.fr/la-reunion/protocole-de-validation">standard Validation</a> du SINP et sur ses <a class="reference external" href="http://standards-sinp.mnhn.fr/nomenclature/80-niveaux-de-validation-validation-manuelle-ou-combinee-2018-05-14/">nomenclatures officiels</a>.</p>
+<p>Afin de valider une occurrence, celle-ci doit impérativement avoir un UUID. En effet, la validation est stockée en BDD dans la table transversale <code class="docutils literal"><span class="pre">gn_commons.t_validations</span></code>  (<a class="reference external" href="admin-manual.html#tables-transversales">voir doc</a> ) qui impose la présence de cet UUID.</p>
+<p>La table <code class="docutils literal"><span class="pre">gn_commons.t_validations</span></code> contient l’ensemble de l’historique de validation des occurrences. Pour une même occurrence (identifiée par un UUID unique) on peut donc retrouver plusieurs lignes dans la table correspondant au différents statuts de validation attribués à cet occurrence dans le temps.</p>
+<p>La vue <code class="docutils literal"><span class="pre">gn_commons.v_latest_validation</span></code> permet de récupérer le dernier statut de validation d’une occurrence.</p>
+<p>NB : une donnée non présente dans la SYNTHESE, ne remontera pas dans l’interface du module VALIDATION. Cependant rien n’empêche un administrateur avancé d’utiliser la table de validation et son mécanisme pour des données qui ne seraient pas en SYNTHESE (du moment que les données disposent d’un UUID).</p>
+<p>Au niveau de l’interface, le formulaire de recherche est commun avec le module SYNTHESE. Les paramètres de configuration du formulaire sont donc également partagés et administrables depuis le fichier <code class="docutils literal"><span class="pre">geonature_config.toml</span></code>, rubrique SYNTHESE.</p>
+</div>
 </div>
 
 
@@ -1201,7 +1312,7 @@ Attention : Si des données sont déjà présentes dans la synthèse et que l’
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, PnE, PnC
+        &copy; Copyright 2018-2019, PnE, PnC
 
     </p>
   </div>

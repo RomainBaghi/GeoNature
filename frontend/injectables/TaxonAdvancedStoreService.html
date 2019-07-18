@@ -56,7 +56,7 @@
             <h3>File</h3>
         </p>
         <p class="comment">
-            <code>src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts</code>
+            <code>src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts</code>
         </p>
 
 
@@ -74,6 +74,10 @@
                 <tr>
                     <td class="col-md-4">
                         <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#AppConfig">AppConfig</a>
+                            </li>
                             <li>
                                     <span class="modifier">Public</span>
                                 <a href="#formBuilded">formBuilded</a>
@@ -110,20 +114,6 @@
                     </td>
                 </tr>
 
-                <tr>
-                    <td class="col-md-4">
-                        <h6><b>Methods</b></h6>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col-md-4">
-                        <ul class="index-list">
-                            <li>
-                                <a href="#formatTaxonTree">formatTaxonTree</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
 
 
 
@@ -139,12 +129,12 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-<code>constructor(_dataService: <a href="../injectables/DataFormService.html">DataFormService</a>, _syntheseDateService: <a href="../injectables/DataService.html">DataService</a>, _formService: <a href="../injectables/SyntheseFormService.html">SyntheseFormService</a>, _formGen: <a href="../injectables/DynamicFormService.html">DynamicFormService</a>)</code>
+<code>constructor(_dataService: <a href="../injectables/DataFormService.html">DataFormService</a>, _validationDataService: <a href="../injectables/SyntheseDataService.html">SyntheseDataService</a>, _formService: <a href="../injectables/SyntheseFormService.html">SyntheseFormService</a>, _formGen: <a href="../injectables/DynamicFormService.html">DynamicFormService</a>)</code>
                     </td>
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:18</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:20</a></div>
                             </td>
                         </tr>
 
@@ -174,10 +164,10 @@
                                                     
                                                 </tr>
                                                 <tr>
-                                                        <td>_syntheseDateService</td>
+                                                        <td>_validationDataService</td>
                                                   
                                                         <td>
-                                                                        <code><a href="../injectables/DataService.html" target="_self" >DataService</a></code>
+                                                                        <code><a href="../injectables/SyntheseDataService.html" target="_self" >SyntheseDataService</a></code>
                                                         </td>
                                                   
                                                     <td>
@@ -218,83 +208,39 @@
         </table>
 </section>
 
-            <section>
-    
-    <h3 id="methods">
-        Methods
-    </h3>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="formatTaxonTree"></a>
-                    <span class="name">
-                        <b>
-                            formatTaxonTree
-                        </b>
-                        <a href="#formatTaxonTree"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-<code>formatTaxonTree(taxonTree)</code>
-                </td>
-            </tr>
 
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="80"
-                            class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:80</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>taxonTree</td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>    <code>{}</code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</section>
             <section>
     
         <h3 id="inputs">
             Properties
         </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="AppConfig"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            AppConfig</b>
+                            <a href="#AppConfig"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>AppConfig</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:12</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
         <table class="table table-sm table-bordered">
             <tbody>
                 <tr>
@@ -316,7 +262,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:15</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:17</a></div>
                             </td>
                         </tr>
 
@@ -344,7 +290,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:14</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:16</a></div>
                             </td>
                         </tr>
 
@@ -372,7 +318,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:18</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:20</a></div>
                             </td>
                         </tr>
 
@@ -400,7 +346,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:17</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:19</a></div>
                             </td>
                         </tr>
 
@@ -428,7 +374,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:16</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:18</a></div>
                             </td>
                         </tr>
 
@@ -456,7 +402,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:11</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:13</a></div>
                             </td>
                         </tr>
 
@@ -484,7 +430,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:13</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:15</a></div>
                             </td>
                         </tr>
 
@@ -512,7 +458,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/syntheseModule/synthese-search/taxon-advanced/taxon-advanced-store.service.ts:12</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/app/GN2CommonModule/form/synthese-form/advanced-form/synthese-advanced-form-store.service.ts:14</a></div>
                             </td>
                         </tr>
 
@@ -527,14 +473,16 @@
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
 import { DataFormService } from &#x27;@geonature_common/form/data-form.service&#x27;;
-import { AppConfig } from &#x27;@geonature_config/app.config&#x27;;
-import { DataService } from &#x27;../../services/data.service&#x27;;
-import { SyntheseFormService } from &#x27;../../services/form.service&#x27;;
+import { SyntheseDataService } from &#x27;@geonature_common/form/synthese-form/synthese-data.service&#x27;;
+import { SyntheseFormService } from &#x27;@geonature_common/form/synthese-form/synthese-form.service&#x27;;
 import { DynamicFormService } from &#x27;@geonature_common/form/dynamic-form/dynamic-form.service&#x27;;
 import { TreeModel } from &#x27;angular-tree-component&#x27;;
+import { AppConfig } from &#x27;@geonature_config/app.config&#x27;;
+import { formatTaxonTree } from &#x27;@geonature_common/form/taxon-tree/taxon-tree.service&#x27;;
 
 @Injectable()
 export class TaxonAdvancedStoreService {
+  public AppConfig &#x3D; AppConfig;
   public taxonTree: any;
   public treeModel: TreeModel;
   public taxonTreeState: any;
@@ -546,13 +494,13 @@ export class TaxonAdvancedStoreService {
 
   constructor(
     private _dataService: DataFormService,
-    private _syntheseDateService: DataService,
+    private _validationDataService: SyntheseDataService,
     private _formService: SyntheseFormService,
     private _formGen: DynamicFormService
   ) {
     if (AppConfig.SYNTHESE.DISPLAY_TAXON_TREE) {
-      this._syntheseDateService.getTaxonTree().subscribe(data &#x3D;&gt; {
-        this.taxonTree &#x3D; this.formatTaxonTree(data);
+      this._validationDataService.getTaxonTree().subscribe(data &#x3D;&gt; {
+        this.taxonTree &#x3D; formatTaxonTree(data);
       });
     }
 
@@ -602,173 +550,6 @@ export class TaxonAdvancedStoreService {
       }
       this.taxonomyGroup2Inpn &#x3D; all_groups;
     });
-  }
-
-  formatTaxonTree(taxonTree) {
-    const formattedTree &#x3D; [];
-    let childrensRegne &#x3D; [];
-    let childrensEmbranchement &#x3D; [];
-    let childrensClasse &#x3D; [];
-    let childrensOrdre &#x3D; [];
-    let childrensFamille &#x3D; [];
-    let kd &#x3D; null;
-    let emb &#x3D; null;
-    let cl &#x3D; null;
-    let desc_cl &#x3D; null;
-    let ord &#x3D; null;
-    let fam &#x3D; null;
-    let nouveauRegne &#x3D; false;
-    let nouvelEmbranchement &#x3D; false;
-    let nouvelleClasse &#x3D; false;
-    let nouvelOrdre &#x3D; false;
-    let nouvelleFamille &#x3D; false;
-    let child &#x3D; {};
-    let regne &#x3D; {};
-    let embranchement &#x3D; {};
-    let classe &#x3D; {};
-    let ordre &#x3D; {};
-    let famille &#x3D; {};
-
-    //on bouble sur les enregistrements du store des taxons issu de la base
-    taxonTree.forEach(record &#x3D;&gt; {
-      if (kd &#x3D;&#x3D;&#x3D; null) {
-        kd &#x3D; record.nom_regne;
-      } //initialisation
-      if (emb &#x3D;&#x3D;&#x3D; null) {
-        emb &#x3D; record.nom_embranchement;
-      } //initialisation
-      if (cl &#x3D;&#x3D;&#x3D; null) {
-        cl &#x3D; record.nom_classe;
-      } //initialisation
-      if (desc_cl &#x3D;&#x3D;&#x3D; null) {
-        desc_cl &#x3D; record.desc_classe;
-      } //initialisation
-      if (ord &#x3D;&#x3D;&#x3D; null) {
-        ord &#x3D; record.nom_ordre;
-      } //initialisation
-      if (fam &#x3D;&#x3D;&#x3D; null) {
-        fam &#x3D; record.nom_famille;
-      } //initialisation
-      if (kd !&#x3D;&#x3D; record.nom_regne) {
-        nouveauRegne &#x3D; true;
-      } // si on a changé de niveau de règne
-      if (emb !&#x3D;&#x3D; record.nom_embranchement) {
-        nouvelEmbranchement &#x3D; true;
-      } // si on a changé de niveau d&#x27;embranchement
-      if (cl !&#x3D;&#x3D; record.nom_classe) {
-        nouvelleClasse &#x3D; true;
-      } // si on a changé de niveau de classe
-      if (ord !&#x3D;&#x3D; record.nom_ordre) {
-        nouvelOrdre &#x3D; true;
-      } // si on a changé de niveau d&#x27;ordre
-      if (fam !&#x3D;&#x3D; record.nom_famille) {
-        nouvelleFamille &#x3D; true;
-      } // si on a changé de niveau de famille
-
-      //création d&#x27;un noeud final avec checkbox
-      child &#x3D; {
-        id: record.cd_ref,
-        name: record.nom_latin + &#x27; - &#x27; + record.nom_francais,
-        classes: [&#x27;leaf&#x27;],
-        leaf: true,
-        checked: false
-      };
-      if (nouvelleFamille) {
-        //on crée le groupe
-        famille &#x3D; {
-          name: fam,
-          checked: false,
-          children: childrensFamille
-        };
-        childrensOrdre.push(famille); //on ajoute ce groupe à l&#x27;arbre
-        nouvelleFamille &#x3D; false; //on repasse à false pour les prochains tests
-        childrensFamille &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
-      }
-      if (nouvelOrdre) {
-        //on crée le groupe
-        ordre &#x3D; {
-          name: ord,
-          checked: false,
-          children: childrensOrdre
-        };
-        childrensClasse.push(ordre); //on ajoute ce groupe à l&#x27;arbre
-        nouvelOrdre &#x3D; false; //on repasse à false pour les prochains tests
-        childrensOrdre &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
-      }
-      if (nouvelleClasse) {
-        //on crée le groupe
-        classe &#x3D; {
-          name: cl + &#x27; - &#x27; + desc_cl,
-          checked: false,
-          children: childrensClasse
-        };
-        childrensEmbranchement.push(classe); //on ajoute ce groupe à l&#x27;arbre
-        nouvelleClasse &#x3D; false; //on repasse à false pour les prochains tests
-        childrensClasse &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
-      }
-      if (nouvelEmbranchement) {
-        //on crée le groupe
-        embranchement &#x3D; {
-          name: emb,
-          checked: false,
-          children: childrensEmbranchement
-        };
-        childrensRegne.push(embranchement); //on ajoute ce groupe à l&#x27;arbre
-        nouvelEmbranchement &#x3D; false; //on repasse à false pour les prochains tests
-        childrensEmbranchement &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
-      }
-      if (nouveauRegne) {
-        //on crée le groupe
-        regne &#x3D; {
-          name: kd,
-          checked: false,
-          children: childrensRegne
-        };
-        formattedTree.push(regne); //on ajoute ce groupe à l&#x27;arbre
-        nouveauRegne &#x3D; false; //on repasse à false pour les prochains tests
-        childrensRegne &#x3D; []; //on vide la variable qui contenait le groupe pour en accueillir un nouveau
-      }
-      childrensFamille.push(child); //ajout du noeud au groupe
-      kd &#x3D; record.nom_regne; //kd prend la valeur en cours du groupe pour un nouveau test en début de boucle
-      emb &#x3D; record.nom_embranchement; //emb prend la valeur en cours du groupe pour un nouveau test en début de boucle
-      cl &#x3D; record.nom_classe; //cl prend la valeur en cours du groupe pour un nouveau test en début de boucle
-      desc_cl &#x3D; record.desc_classe; //
-      ord &#x3D; record.nom_ordre; //ord prend la valeur en cours du groupe pour un nouveau test en début de boucle
-      fam &#x3D; record.nom_famille; //fam prend la valeur en cours du groupe pour un nouveau test en début de boucle
-    }); //fin de la boucle
-
-    //ajout du dernier groupe après la fin de la dernière boucle
-    famille &#x3D; {
-      name: fam,
-      checked: false,
-      children: childrensFamille
-    };
-    ordre &#x3D; {
-      name: ord,
-      checked: false,
-      children: childrensOrdre
-    };
-    classe &#x3D; {
-      name: cl + &#x27; - &#x27; + desc_cl,
-      checked: false,
-      children: childrensClasse
-    };
-    embranchement &#x3D; {
-      name: emb,
-      checked: false,
-      children: childrensEmbranchement
-    };
-    regne &#x3D; {
-      name: kd,
-      checked: false,
-      children: childrensRegne
-    };
-    childrensOrdre.push(famille);
-    childrensClasse.push(ordre);
-    childrensEmbranchement.push(classe);
-    childrensRegne.push(embranchement);
-    formattedTree.push(regne);
-    return formattedTree;
   }
 }
 </code></pre>

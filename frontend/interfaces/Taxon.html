@@ -972,7 +972,6 @@ export class TaxonomyComponent implements OnInit {
   regnesAndGroup: any;
   noResult: boolean;
   isLoading &#x3D; false;
-  showResultList &#x3D; true;
   @Output() onChange &#x3D; new EventEmitter&lt;NgbTypeaheadSelectItemEvent&gt;(); // renvoie l&#x27;evenement, le taxon est récupérable grâce à e.item
   @Output() onDelete &#x3D; new EventEmitter&lt;Taxon&gt;();
 
@@ -987,7 +986,6 @@ export class TaxonomyComponent implements OnInit {
       .filter(value &#x3D;&gt; value !&#x3D;&#x3D; null &amp;&amp; value.length &#x3D;&#x3D;&#x3D; 0)
       .subscribe(value &#x3D;&gt; {
         this.onDelete.emit();
-        this.showResultList &#x3D; false;
       });
     if (this.displayAdvancedFilters) {
       // get regne and group2

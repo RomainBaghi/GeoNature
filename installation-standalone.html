@@ -104,6 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation-de-l-application">Installation de l’application</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#creation-de-la-base-de-donnees">Création de la base de données</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Installation de l’application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-apache">Configuration Apache</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dependances">Dépendances</a></li>
@@ -234,7 +235,8 @@ Pour une installation packagée voir cette <a class="reference external" href="h
 <li><p class="first">Se reconnecter en SSH au serveur avec le nouvel utilisateur pour ne pas faire l’installation en <code class="docutils literal"><span class="pre">root</span></code>. On ne se connectera plus en <code class="docutils literal"><span class="pre">root</span></code>. Si besoin d’éxecuter des commandes avec des droits d’administrateur, on les précède de <code class="docutils literal"><span class="pre">sudo</span></code>. Il est d’ailleurs possible renforcer la sécurité du serveur en bloquant la connexion SSH au serveur avec root. Voir <a class="reference external" href="https://docs.ovh.com/fr/vps/conseils-securisation-vps/">https://docs.ovh.com/fr/vps/conseils-securisation-vps/</a> pour plus d’informations sur le sécurisation du serveur.</p>
 </li>
 <li><p class="first">Lancez les commandes suivantes pour installer les dépendances de GeoNature (debian 9) :</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">postgresql</span> <span class="n">postgis</span> <span class="n">postgresql</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mf">9.6</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">wget</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">postgresql</span> <span class="n">postgis</span> <span class="n">postgresql</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mf">9.6</span>
 <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">dev</span> <span class="n">python3</span><span class="o">-</span><span class="n">setuptools</span> <span class="n">python</span><span class="o">-</span><span class="n">pip</span> <span class="n">libpq</span><span class="o">-</span><span class="n">dev</span> <span class="n">libgdal</span><span class="o">-</span><span class="n">dev</span> <span class="n">python</span><span class="o">-</span><span class="n">gdal</span> <span class="n">python</span><span class="o">-</span><span class="n">virtualenv</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span>
 <span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span> <span class="n">virtualenv</span> <span class="n">virtualenvwrapper</span>
 <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">npm</span>
@@ -251,7 +253,7 @@ Pour une installation packagée voir cette <a class="reference external" href="h
 <ul>
 <li><p class="first">Se placer dans le répertoire de l’utilisateur (<code class="docutils literal"><span class="pre">/home/geonatureadmin/</span></code> dans notre cas)</p>
 </li>
-<li><p class="first">Récupérer l’application (<code class="docutils literal"><span class="pre">X.Y.Z</span></code> à remplacer par le numéro de la <a class="reference external" href="https://github.com/PnX-SI/GeoNature/releases">dernière version stable de GeoNature</a>). La version 2 de GeoNature est actuellement en cours de développement, et propose des versions 2.0.0-rc.X. Voir le <a class="reference external" href="versions-compatibility.rst">tableau de compatibilité</a> des versions de GeoNature avec ses dépendances.</p>
+<li><p class="first">Récupérer l’application (<code class="docutils literal"><span class="pre">X.Y.Z</span></code> à remplacer par le numéro de la <a class="reference external" href="https://github.com/PnX-SI/GeoNature/releases">dernière version stable de GeoNature</a>). Voir le <a class="reference external" href="versions-compatibility.rst">tableau de compatibilité</a> des versions de GeoNature avec ses dépendances.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">PnX</span><span class="o">-</span><span class="n">SI</span><span class="o">/</span><span class="n">GeoNature</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">X</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">zip</span>
 </pre></div>
 </div>
@@ -289,15 +291,15 @@ Pour une installation packagée voir cette <a class="reference external" href="h
 </div>
 <div class="section" id="id1">
 <h3>Installation de l’application<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Lancer le script d’installation de l’application :</p>
+<p>Lancer le script d’installation de l’application (depuis le répertoire <code class="docutils literal"><span class="pre">install</span></code>):</p>
 <p>La commande <code class="docutils literal"><span class="pre">install_app.sh</span></code> comporte deux paramètres optionnels qui doivent être utilisés dans l’ordre :</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">-s</span></code> ou <code class="docutils literal"><span class="pre">--settings-path</span></code> pour spécifier un autre emplacement pour le fichier <code class="docutils literal"><span class="pre">settings.ini</span></code></li>
 <li><code class="docutils literal"><span class="pre">-d</span></code> ou <code class="docutils literal"><span class="pre">--dev</span></code> permet d’installer des dépendances python utile pour le développement de GeoNature et de ne pas compiler inutilement le frontend</li>
 <li><code class="docutils literal"><span class="pre">-h</span></code> ou <code class="docutils literal"><span class="pre">--help</span></code> affiche l’aide pour cette commande <code class="docutils literal"><span class="pre">install_app.sh</span></code></li>
 </ul>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">install_app</span><span class="o">.</span><span class="n">log</span>
-<span class="o">./</span><span class="n">install_app</span><span class="o">.</span><span class="n">sh</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">|</span> <span class="n">tee</span> <span class="n">install_all</span><span class="o">.</span><span class="n">log</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="o">../</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">install_app</span><span class="o">.</span><span class="n">log</span>
+<span class="o">./</span><span class="n">install_app</span><span class="o">.</span><span class="n">sh</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">|</span> <span class="n">tee</span> <span class="o">../</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">install_app</span><span class="o">.</span><span class="n">log</span>
 </pre></div>
 </div>
 <p>Pendant l’installation, vous serez invité à fournir le mot de passe <code class="docutils literal"><span class="pre">sudo</span></code> de votre utilisateur linux.</p>
@@ -307,6 +309,32 @@ Pour une installation packagée voir cette <a class="reference external" href="h
 <span class="p">[</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;$NVM_DIR/nvm.sh&quot;</span> <span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="o">.</span> <span class="s2">&quot;$NVM_DIR/nvm.sh&quot;</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="configuration-apache">
+<h3>Configuration Apache<a class="headerlink" href="#configuration-apache" title="Permalink to this headline">¶</a></h3>
+<p>Créer le fichier de configuration Apache de GeoNature</p>
+<p><code class="docutils literal"><span class="pre">sudo</span> <span class="pre">nano</span> <span class="pre">/etc/apache2/sites-available/geonature.conf</span></code></p>
+<p>Puis coller la configuration suivante:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Alias</span> <span class="o">/</span><span class="n">geonature</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">geonatureadmin</span><span class="o">/</span><span class="n">geonature</span><span class="o">/</span><span class="n">frontend</span><span class="o">/</span><span class="n">dist</span>
+<span class="o">&lt;</span><span class="n">Directory</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">geonatureadmin</span><span class="o">/</span><span class="n">geonature</span><span class="o">/</span><span class="n">frontend</span><span class="o">/</span><span class="n">dist</span><span class="o">&gt;</span>
+  <span class="n">Require</span> <span class="nb">all</span> <span class="n">granted</span>
+<span class="o">&lt;/</span><span class="n">Directory</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">Location</span> <span class="o">/</span><span class="n">geonature</span><span class="o">/</span><span class="n">api</span><span class="o">&gt;</span>
+ <span class="n">ProxyPass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">8000</span>
+ <span class="n">ProxyPassReverse</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">8000</span>
+<span class="o">&lt;/</span><span class="n">Location</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Activer les modules suivants:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">a2enmod</span> <span class="n">rewrite</span>
+<span class="n">sudo</span> <span class="n">a2enmod</span> <span class="n">proxy</span>
+<span class="n">sudo</span> <span class="n">a2enmod</span> <span class="n">proxy_http</span>
+</pre></div>
+</div>
+<p>Activer la nouvelle configuration:</p>
+<p><code class="docutils literal"><span class="pre">sudo</span> <span class="pre">a2ensite</span> <span class="pre">geonature.conf</span></code></p>
+<p>et redémarrer Apache:</p>
+<p><code class="docutils literal"><span class="pre">sudo</span> <span class="pre">service</span> <span class="pre">apache2</span> <span class="pre">restart</span></code></p>
 <p>L’application est disponible à l’adresse suivante :</p>
 <ul class="simple">
 <li><a class="reference external" href="http://monip.com/geonature">http://monip.com/geonature</a></li>
@@ -455,7 +483,7 @@ cd geonature
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, PnE, PnC
+        &copy; Copyright 2018-2019, PnE, PnC
 
     </p>
   </div>

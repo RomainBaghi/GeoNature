@@ -1,0 +1,442 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>geonature documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">geonature documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content interface">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Interfaces</li>
+  <li>ParamsDict</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/app/GN2CommonModule/form/data-form.service.ts</code>
+        </p>
+
+            <p class="comment">
+                <h3>Description</h3>
+            </p>
+            <p class="comment">
+                <p>Interface for queryString parameters</p>
+
+            </p>
+
+
+
+
+            <section>
+    <h3 id="inputs">Indexable</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <code>[key: string]:        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="8" class="link-to-prism">src/app/GN2CommonModule/form/data-form.service.ts:8</a></div>
+                            </td>
+                        </tr>
+            </tbody>
+        </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+import { HttpClient, HttpParams } from &#x27;@angular/common/http&#x27;;
+import &#x27;rxjs/add/operator/toPromise&#x27;;
+import { AppConfig } from &#x27;../../../conf/app.config&#x27;;
+import { Taxon } from &#x27;./taxonomy/taxonomy.component&#x27;;
+
+/** Interface for queryString parameters*/
+interface ParamsDict {
+  [key: string]: any;
+}
+
+@Injectable()
+export class DataFormService {
+  constructor(private _http: HttpClient) {}
+
+  getNomenclature(
+    codeNomenclatureType: string,
+    regne?: string,
+    group2_inpn?: string,
+    filters?: any
+  ) {
+    let params: HttpParams &#x3D; new HttpParams();
+    regne ? (params &#x3D; params.set(&#x27;regne&#x27;, regne)) : (params &#x3D; params.set(&#x27;regne&#x27;, &#x27;&#x27;));
+    group2_inpn
+      ? (params &#x3D; params.set(&#x27;group2_inpn&#x27;, group2_inpn))
+      : (params &#x3D; params.set(&#x27;group2_inpn&#x27;, &#x27;&#x27;));
+    if (filters[&#x27;orderby&#x27;]) {
+      params &#x3D; params.set(&#x27;orderby&#x27;, filters[&#x27;orderby&#x27;]);
+    }
+    if (filters[&#x27;order&#x27;]) {
+      params &#x3D; params.set(&#x27;order&#x27;, filters[&#x27;order&#x27;]);
+    }
+    return this._http.get&lt;any&gt;(
+      &#x60;${AppConfig.API_ENDPOINT}/nomenclatures/nomenclature/${codeNomenclatureType}&#x60;,
+      { params: params }
+    );
+  }
+
+  getNomenclatures(...codesNomenclatureType) {
+    let params: HttpParams &#x3D; new HttpParams();
+    codesNomenclatureType.forEach(code &#x3D;&gt; {
+      params &#x3D; params.append(&#x27;code_type&#x27;, code);
+    });
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/nomenclatures/nomenclatures&#x60;, {
+      params: params
+    });
+  }
+
+  getDatasets(params?: ParamsDict, orderByName &#x3D; true) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (orderByName) {
+      queryString &#x3D; this.addOrderBy(queryString, &#x27;dataset_name&#x27;);
+    }
+
+    if (params) {
+      for (const key in params) {
+        if (key &#x3D;&#x3D;&#x3D; &#x27;idOrganism&#x27;) {
+          queryString &#x3D; queryString.set(&#x27;organisme&#x27;, params[key]);
+          // is its an array of id_af
+        } else if (key &#x3D;&#x3D;&#x3D; &#x27;id_acquisition_frameworks&#x27;) {
+          params[key].forEach(id_af &#x3D;&gt; {
+            queryString &#x3D; queryString.append(&#x27;id_acquisition_framework&#x27;, id_af);
+          });
+        } else {
+          queryString &#x3D; queryString.set(key, params[key].toString());
+        }
+      }
+    }
+
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/meta/datasets&#x60;, {
+      params: queryString
+    });
+  }
+
+  getObservers(idMenu) {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/users/menu/${idMenu}&#x60;);
+  }
+
+  autocompleteTaxon(api_endpoint: string, searh_name: string, params?: { [key: string]: string }) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    queryString &#x3D; queryString.set(&#x27;search_name&#x27;, searh_name);
+    for (let key in params) {
+      if (params[key]) {
+        queryString &#x3D; queryString.set(key, params[key]);
+      }
+    }
+    return this._http.get&lt;Taxon[]&gt;(&#x60;${api_endpoint}&#x60;, {
+      params: queryString
+    });
+  }
+
+  getTaxonInfo(cd_nom: number) {
+    return this._http.get&lt;Taxon&gt;(&#x60;${AppConfig.API_TAXHUB}/taxref/${cd_nom}&#x60;);
+  }
+
+  getTaxonAttributsAndMedia(cd_nom: number, id_attributs?: Array&lt;number&gt;) {
+    let query_string &#x3D; new HttpParams();
+    if (id_attributs) {
+      id_attributs.forEach(id &#x3D;&gt; {
+        query_string &#x3D; query_string.append(&#x27;id_attribut&#x27;, id.toString());
+      });
+    }
+
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_TAXHUB}/bibnoms/taxoninfo/${cd_nom}&#x60;, {
+      params: query_string
+    });
+  }
+
+  async getTaxonInfoSynchrone(cd_nom: number): Promise&lt;any&gt; {
+    const response &#x3D; await this._http
+      .get&lt;Taxon&gt;(&#x60;${AppConfig.API_TAXHUB}/taxref/${cd_nom}&#x60;)
+      .toPromise();
+    return response;
+  }
+
+  getRegneAndGroup2Inpn() {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_TAXHUB}/taxref/regnewithgroupe2&#x60;);
+  }
+
+  getTaxhubBibAttributes() {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_TAXHUB}/bibattributs/&#x60;);
+  }
+
+  getTaxonomyLR() {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_TAXHUB}/taxref/bib_lr&#x60;);
+  }
+
+  getTaxonomyHabitat() {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_TAXHUB}/taxref/bib_habitats&#x60;);
+  }
+
+  getGeoInfo(geojson) {
+    return this._http.post&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/geo/info&#x60;, geojson);
+  }
+
+  getGeoIntersection(geojson, idType?) {
+    if (idType) {
+      geojson[&#x27;id_type&#x27;] &#x3D; idType;
+    }
+    return this._http.post(&#x60;${AppConfig.API_ENDPOINT}/geo/areas&#x60;, geojson);
+  }
+
+  getFormatedGeoIntersection(geojson, idType?) {
+    if (idType) {
+      geojson[&#x27;id_type&#x27;] &#x3D; idType;
+    }
+    return this._http.post(&#x60;${AppConfig.API_ENDPOINT}/geo/areas&#x60;, geojson).map(res &#x3D;&gt; {
+      const areasIntersected &#x3D; [];
+      Object.keys(res).forEach(key &#x3D;&gt; {
+        const typeName &#x3D; res[key][&#x27;type_name&#x27;];
+        const areas &#x3D; res[key][&#x27;areas&#x27;];
+        const formatedAreas &#x3D; areas.map(area &#x3D;&gt; area.area_name).join(&#x27;, &#x27;);
+        const obj &#x3D; {
+          type_name: typeName,
+          areas: formatedAreas
+        };
+        areasIntersected.push(obj);
+      });
+      return areasIntersected;
+    });
+  }
+
+  getMunicipalities(nom_com?, limit?) {
+    let params: HttpParams &#x3D; new HttpParams();
+
+    if (nom_com) {
+      params &#x3D; params.set(&#x27;nom_com&#x27;, nom_com);
+    }
+    if (limit) {
+      params &#x3D; params.set(&#x27;limit&#x27;, limit);
+    }
+
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/geo/municipalities&#x60;, { params: params });
+  }
+
+  getAreas(area_type_list: Array&lt;number&gt;, area_name?) {
+    let params: HttpParams &#x3D; new HttpParams();
+
+    area_type_list.forEach(id_type &#x3D;&gt; {
+      params &#x3D; params.append(&#x27;id_type&#x27;, id_type.toString());
+    });
+
+    if (area_name) {
+      params &#x3D; params.set(&#x27;area_name&#x27;, area_name);
+    }
+
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/geo/areas&#x60;, { params: params });
+  }
+
+  /**
+   *
+   * @param params: dict of paramters
+   * @param orderByName :default true
+   */
+  getAcquisitionFrameworks(params?: ParamsDict, orderByName &#x3D; true) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (orderByName) {
+      queryString &#x3D; this.addOrderBy(queryString, &#x27;acquisition_framework_name&#x27;);
+    }
+    if (params) {
+      // tslint:disable-next-line:forin
+      for (let key in params) {
+        if (params[key] !&#x3D;&#x3D; null) {
+          queryString &#x3D; queryString.set(key, params[key]);
+        }
+      }
+    }
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/meta/acquisition_frameworks&#x60;, {
+      params: queryString
+    });
+  }
+
+  getAcquisitionFramework(id_af) {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/meta/acquisition_framework/${id_af}&#x60;);
+  }
+
+  getOrganisms(orderByName &#x3D; true) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (orderByName) {
+      queryString &#x3D; this.addOrderBy(queryString, &#x27;nom_organisme&#x27;);
+    }
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/users/organisms&#x60;, {
+      params: queryString
+    });
+  }
+
+  getOrganismsDatasets(orderByName &#x3D; true) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (orderByName) {
+      queryString &#x3D; this.addOrderBy(queryString, &#x27;nom_organisme&#x27;);
+    }
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/users/organisms_dataset_actor&#x60;, {
+      params: queryString
+    });
+  }
+
+  getRoles(params?: ParamsDict, orderByName &#x3D; true) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (orderByName) {
+      queryString &#x3D; this.addOrderBy(queryString, &#x27;nom_role&#x27;);
+    }
+    // tslint:disable-next-line:forin
+    for (let key in params) {
+      if (params[key] !&#x3D;&#x3D; null) {
+        queryString &#x3D; queryString.set(key, params[key]);
+      }
+    }
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/users/roles&#x60;, { params: queryString });
+  }
+
+  getDataset(id) {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/meta/dataset/${id}&#x60;);
+  }
+
+  getModulesList(exclude: Array&lt;string&gt;) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    exclude.forEach(mod_code &#x3D;&gt; {
+      queryString &#x3D; queryString.append(&#x27;exclude&#x27;, mod_code);
+    });
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/gn_commons/modules&#x60;, {
+      params: queryString
+    });
+  }
+
+  getModuleByCodeName(module_code) {
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/gn_commons/modules/${module_code}&#x60;);
+  }
+
+  getCruved(modules_code?: Array&lt;string&gt;) {
+    let queryString: HttpParams &#x3D; new HttpParams();
+    if (modules_code) {
+      modules_code.forEach(mod_code &#x3D;&gt; {
+        queryString &#x3D; queryString.append(&#x27;module_code&#x27;, mod_code);
+      });
+    }
+    return this._http.get&lt;any&gt;(&#x60;${AppConfig.API_ENDPOINT}/permissions/cruved&#x60;, {
+      params: queryString
+    });
+  }
+
+  addOrderBy(httpParam: HttpParams, order_column): HttpParams {
+    return httpParam.append(&#x27;orderby&#x27;, order_column);
+  }
+}
+</code></pre>
+    </div>
+</div>
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'interface';
+            var COMPODOC_CURRENT_PAGE_URL = 'ParamsDict.html';
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

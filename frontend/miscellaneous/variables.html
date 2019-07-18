@@ -60,7 +60,7 @@
                             <a href="#AppConfig" title="src/conf/app.config.ts"><b>AppConfig</b>&nbsp;&nbsp;&nbsp;(src/.../app.config.ts)</a>
                         </li>
                         <li>
-                            <a href="#DYNAMIC_FORM_DEF" title="src/app/syntheseModule/services/dynamycFormConfig.ts"><b>DYNAMIC_FORM_DEF</b>&nbsp;&nbsp;&nbsp;(src/.../dynamycFormConfig.ts)</a>
+                            <a href="#DYNAMIC_FORM_DEF" title="src/app/GN2CommonModule/form/synthese-form/dynamycFormConfig.ts"><b>DYNAMIC_FORM_DEF</b>&nbsp;&nbsp;&nbsp;(src/.../dynamycFormConfig.ts)</a>
                         </li>
                         <li>
                             <a href="#environment" title="src/environments/environment.prod.ts"><b>environment</b>&nbsp;&nbsp;&nbsp;(src/.../environment.prod.ts)</a>
@@ -70,6 +70,9 @@
                         </li>
                         <li>
                             <a href="#FormatMapMime" title="src/app/syntheseModule/services/data.service.ts"><b>FormatMapMime</b>&nbsp;&nbsp;&nbsp;(src/.../data.service.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#FormatMapMime" title="src/app/GN2CommonModule/form/synthese-form/synthese-data.service.ts"><b>FormatMapMime</b>&nbsp;&nbsp;&nbsp;(src/.../synthese-data.service.ts)</a>
                         </li>
                         <li>
                             <a href="#FormatMapMime" title="src/app/GN2CommonModule/others/modal-download/modal-download.component.ts"><b>FormatMapMime</b>&nbsp;&nbsp;&nbsp;(src/.../modal-download.component.ts)</a>
@@ -110,34 +113,97 @@
                     <tr>
                         <td class="col-md-4">
                             <i>Default value : </i><code>{
+ &quot;ENABLE_NOMENCLATURE_TAXONOMIC_FILTERS&quot;: true,
+ &quot;CAS_PUBLIC&quot;: {
+  &quot;CAS_URL_LOGIN&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/login&quot;,
+  &quot;CAS_AUTHENTIFICATION&quot;: false,
+  &quot;CAS_URL_LOGOUT&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/logout&quot;
+ },
+ &quot;API_TAXHUB&quot;: &quot;http://127.0.0.1:5000/api&quot;,
+ &quot;URL_APPLICATION&quot;: &quot;http://127.0.0.1:4200&quot;,
+ &quot;GEONATURE_VERSION&quot;: &quot;2.1.0-dev0&quot;,
  &quot;MTD_API_ENDPOINT&quot;: &quot;https://preprod-inpn.mnhn.fr/mtd&quot;,
+ &quot;ID_APPLICATION_GEONATURE&quot;: 3,
+ &quot;RIGHTS&quot;: {
+  &quot;MY_DATA&quot;: 1,
+  &quot;MY_ORGANISM_DATA&quot;: 2,
+  &quot;NOTHING&quot;: 0,
+  &quot;ALL_DATA&quot;: 3
+ },
+ &quot;FRONTEND&quot;: {
+  &quot;MULTILINGUAL&quot;: false,
+  &quot;DISPLAY_STAT_BLOC&quot;: true,
+  &quot;PROD_MOD&quot;: true,
+  &quot;DISPLAY_MAP_LAST_OBS&quot;: true,
+  &quot;DISPLAY_FOOTER&quot;: true
+ },
+ &quot;LOCAL_SRID&quot;: 2154,
+ &quot;BDD&quot;: {
+  &quot;id_area_type_municipality&quot;: 25,
+  &quot;ID_USER_SOCLE_1&quot;: 8,
+  &quot;ID_USER_SOCLE_2&quot;: 6
+ },
+ &quot;XML_NAMESPACE&quot;: &quot;{http://inpn.mnhn.fr/mtd}&quot;,
  &quot;SYNTHESE&quot;: {
   &quot;EXPORT_GEOJSON_4326_COL&quot;: &quot;geojson_4326&quot;,
   &quot;EXPORT_ID_DATASET_COL&quot;: &quot;jddId&quot;,
+  &quot;EXPORT_ID_DIGITISER_COL&quot;: &quot;id_digitiser&quot;,
+  &quot;DISPLAY_TAXON_TREE&quot;: true,
+  &quot;CRUVED_SEARCH_WITH_OBSERVER_AS_TXT&quot;: false,
+  &quot;EXPORT_FORMAT&quot;: [
+   &quot;csv&quot;,
+   &quot;geojson&quot;,
+   &quot;shapefile&quot;
+  ],
+  &quot;NB_LAST_OBS&quot;: 100,
+  &quot;EXPORT_OBSERVERS_COL&quot;: &quot;observer&quot;,
+  &quot;ID_ATTRIBUT_TAXHUB&quot;: [
+   1,
+   2
+  ],
+  &quot;ENABLE_LEAFLET_CLUSTER&quot;: true,
+  &quot;COLUMNS_API_SYNTHESE_WEB_APP&quot;: [
+   &quot;id_synthese&quot;,
+   &quot;date_min&quot;,
+   &quot;observers&quot;,
+   &quot;nom_valide&quot;,
+   &quot;dataset_name&quot;
+  ],
+  &quot;NB_MAX_OBS_EXPORT&quot;: 50000,
   &quot;TAXON_RESULT_NUMBER&quot;: 20,
+  &quot;EXPORT_GEOJSON_LOCAL_COL&quot;: &quot;geojson_local&quot;,
+  &quot;EXPORT_METADATA_ACTOR_COL&quot;: &quot;acteurs&quot;,
   &quot;LIST_COLUMNS_FRONTEND&quot;: [
    {
-    &quot;name&quot;: &quot;Taxon&quot;,
     &quot;prop&quot;: &quot;nom_vern_or_lb_nom&quot;,
+    &quot;name&quot;: &quot;Taxon&quot;,
     &quot;max_width&quot;: 200
    },
    {
-    &quot;name&quot;: &quot;Date obs&quot;,
     &quot;prop&quot;: &quot;date_min&quot;,
+    &quot;name&quot;: &quot;Date obs&quot;,
     &quot;max_width&quot;: 100
    },
    {
-    &quot;name&quot;: &quot;JDD&quot;,
     &quot;prop&quot;: &quot;dataset_name&quot;,
+    &quot;name&quot;: &quot;JDD&quot;,
     &quot;max_width&quot;: 200
    },
    {
-    &quot;name&quot;: &quot;observateur&quot;,
     &quot;prop&quot;: &quot;observers&quot;,
+    &quot;name&quot;: &quot;observateur&quot;,
     &quot;max_width&quot;: 200
    }
   ],
-  &quot;NB_LAST_OBS&quot;: 100,
+  &quot;AREA_FILTERS&quot;: [
+   {
+    &quot;label&quot;: &quot;Truc hybride&quot;,
+    &quot;id_type&quot;: [
+     25
+    ]
+   }
+  ],
+  &quot;EXPORT_METADATA_ID_DATASET_COL&quot;: &quot;jdd_id&quot;,
   &quot;EXPORT_COLUMNS&quot;: [
    &quot;idSynthese&quot;,
    &quot;permId&quot;,
@@ -182,67 +248,14 @@
    &quot;lastAction&quot;,
    &quot;validateur&quot;
   ],
-  &quot;NB_MAX_OBS_MAP&quot;: 50000,
-  &quot;AREA_FILTERS&quot;: [
-   {
-    &quot;id_type&quot;: 25,
-    &quot;label&quot;: &quot;Communes&quot;
-   }
-  ],
-  &quot;EXPORT_ID_DIGITISER_COL&quot;: &quot;id_digitiser&quot;,
-  &quot;COLUMNS_API_SYNTHESE_WEB_APP&quot;: [
-   &quot;id_synthese&quot;,
-   &quot;date_min&quot;,
-   &quot;observers&quot;,
-   &quot;nom_valide&quot;,
-   &quot;dataset_name&quot;
-  ],
-  &quot;EXPORT_OBSERVERS_COL&quot;: &quot;observer&quot;,
-  &quot;DISPLAY_TAXON_TREE&quot;: true,
-  &quot;CRUVED_SEARCH_WITH_OBSERVER_AS_TXT&quot;: false,
-  &quot;NB_MAX_OBS_EXPORT&quot;: 50000,
-  &quot;EXPORT_FORMAT&quot;: [
-   &quot;csv&quot;,
-   &quot;geojson&quot;,
-   &quot;shapefile&quot;
-  ],
-  &quot;EXPORT_ID_SYNTHESE_COL&quot;: &quot;idSynthese&quot;,
-  &quot;EXPORT_METADATA_ACTOR_COL&quot;: &quot;acteurs&quot;,
-  &quot;ID_ATTRIBUT_TAXHUB&quot;: [
-   102,
-   103
-  ],
-  &quot;EXPORT_GEOJSON_LOCAL_COL&quot;: &quot;geojson_local&quot;,
   &quot;EXCLUDED_COLUMNS&quot;: [],
-  &quot;EXPORT_METADATA_ID_DATASET_COL&quot;: &quot;jdd_id&quot;,
-  &quot;ENABLE_LEAFLET_CLUSTER&quot;: true
- },
- &quot;ENABLE_NOMENCLATURE_TAXONOMIC_FILTERS&quot;: true,
- &quot;GEONATURE_VERSION&quot;: &quot;2.1.0-dev0&quot;,
- &quot;API_TAXHUB&quot;: &quot;http://127.0.0.1:5000&quot;,
- &quot;DEFAULT_LANGUAGE&quot;: &quot;fr&quot;,
- &quot;API_ENDPOINT&quot;: &quot;http://127.0.0.1:8000&quot;,
- &quot;ID_APPLICATION_GEONATURE&quot;: 3,
- &quot;appName&quot;: &quot;GeoNature2&quot;,
- &quot;URL_APPLICATION&quot;: &quot;http://test.ecrins-parcnational.net/geonature&quot;,
- &quot;PASS_METHOD&quot;: &quot;hash&quot;,
- &quot;LOCAL_SRID&quot;: 2154,
- &quot;FRONTEND&quot;: {
-  &quot;MULTILINGUAL&quot;: false,
-  &quot;DISPLAY_FOOTER&quot;: true,
-  &quot;PROD_MOD&quot;: true,
-  &quot;DISPLAY_STAT_BLOC&quot;: true,
-  &quot;DISPLAY_MAP_LAST_OBS&quot;: true
- },
- &quot;RIGHTS&quot;: {
-  &quot;MY_DATA&quot;: 1,
-  &quot;NOTHING&quot;: 0,
-  &quot;ALL_DATA&quot;: 3,
-  &quot;MY_ORGANISM_DATA&quot;: 2
+  &quot;NB_MAX_OBS_MAP&quot;: 50000,
+  &quot;EXPORT_ID_SYNTHESE_COL&quot;: &quot;idSynthese&quot;
  },
  &quot;DEBUG&quot;: false,
+ &quot;appName&quot;: &quot;trsuc&quot;,
+ &quot;DEFAULT_LANGUAGE&quot;: &quot;fr&quot;,
  &quot;MAPCONFIG&quot;: {
-  &quot;ZOOM_ON_CLICK&quot;: 18,
   &quot;ZOOM_LEVEL_RELEVE&quot;: 15,
   &quot;BASEMAP&quot;: [
    {
@@ -257,33 +270,25 @@
    },
    {
     &quot;name&quot;: &quot;GoogleSatellite&quot;,
+    &quot;layer&quot;: &quot;//{s}.google.com/vt/lyrs&#x3D;s&amp;x&#x3D;{x}&amp;y&#x3D;{y}&amp;z&#x3D;{z}&quot;,
     &quot;subdomains&quot;: [
      &quot;mt0&quot;,
      &quot;mt1&quot;,
      &quot;mt2&quot;,
      &quot;mt3&quot;
     ],
-    &quot;layer&quot;: &quot;//{s}.google.com/vt/lyrs&#x3D;s&amp;x&#x3D;{x}&amp;y&#x3D;{y}&amp;z&#x3D;{z}&quot;,
     &quot;attribution&quot;: &quot;\u00a9 GoogleMap&quot;
    }
   ],
-  &quot;ZOOM_LEVEL&quot;: 6,
+  &quot;ZOOM_ON_CLICK&quot;: 18,
   &quot;CENTER&quot;: [
    46.52863469527167,
    2.43896484375
-  ]
+  ],
+  &quot;ZOOM_LEVEL&quot;: 6
  },
- &quot;BDD&quot;: {
-  &quot;ID_USER_SOCLE_2&quot;: 6,
-  &quot;id_area_type_municipality&quot;: 25,
-  &quot;ID_USER_SOCLE_1&quot;: 8
- },
- &quot;XML_NAMESPACE&quot;: &quot;{http://inpn.mnhn.fr/mtd}&quot;,
- &quot;CAS_PUBLIC&quot;: {
-  &quot;CAS_URL_LOGIN&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/login&quot;,
-  &quot;CAS_AUTHENTIFICATION&quot;: false,
-  &quot;CAS_URL_LOGOUT&quot;: &quot;https://preprod-inpn.mnhn.fr/auth/logout&quot;
- }
+ &quot;API_ENDPOINT&quot;: &quot;http://127.0.0.1:8000&quot;,
+ &quot;PASS_METHOD&quot;: &quot;hash&quot;
 }</code>
                         </td>
                     </tr>
@@ -292,7 +297,7 @@
             </tbody>
         </table>
 </section>
-    <h3>src/app/syntheseModule/services/dynamycFormConfig.ts</h3>
+    <h3>src/app/GN2CommonModule/form/synthese-form/dynamycFormConfig.ts</h3>
     <section>
     <h3></h3>        <table class="table table-sm table-bordered">
             <tbody>
@@ -561,6 +566,34 @@
         </table>
 </section>
     <h3>src/app/syntheseModule/services/data.service.ts</h3>
+    <section>
+    <h3></h3>        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="FormatMapMime"></a>
+                        <span class="name">
+                            <b>
+                            FormatMapMime</b>
+                            <a href="#FormatMapMime"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>new Map([
+  [&#x27;csv&#x27;, &#x27;text/csv&#x27;],
+  [&#x27;json&#x27;, &#x27;application/json&#x27;],
+  [&#x27;shp&#x27;, &#x27;application/zip&#x27;]
+])</code>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+</section>
+    <h3>src/app/GN2CommonModule/form/synthese-form/synthese-data.service.ts</h3>
     <section>
     <h3></h3>        <table class="table table-sm table-bordered">
             <tbody>
