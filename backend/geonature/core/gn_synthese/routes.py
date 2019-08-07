@@ -704,7 +704,7 @@ def test(info_role):
         # on peut ici aussi filtrer par module
     )
     data = q_permissions.all()
-    # on ajoute les differents filtres taxo dans un tableau (il peu y en avoir plusieur)
+    # on ajoute les differents filtres taxo dans un tableau (il peut y en avoir plusieurs)
     taxonomic_filters = []
     for d in data:
         # on pousse dans le tableau en transformant en dictionnaire
@@ -714,14 +714,15 @@ def test(info_role):
     # filter la requete des données avec le résultat du filtre TAXO
     query_synthese = query_synthese.join(Taxref, Taxref.cd_nom == Synthese.cd_nom)
     print(taxonomic_filters)
+    # on boucles sur les différents filtres possible
     for t_filter in taxonomic_filters:
-        pass
-    # try a mettre si on trouve pas la colonne
-    for key, value in t_filter.items():
-        # on récupert la colonne taxref sur laquel on veut filrer
-        attr = getattr(Taxref, key)
-        # on applique le where
-        query_synthese = query_synthese.filter(attr == value)
+        # on boucle sur le dictionnaire (ex si il ya {'classe': 'chordatada', 'famille': 'aves'})
+        for key, value in t_filter.items():
+            # on récupert la colonne taxref sur laquel on veut filrer
+            # try a mettre si on trouve pas la colonne
+            attr = getattr(Taxref, key)
+            # on applique le where
+            query_synthese = query_synthese.filter(attr == value)
     print(query_synthese)
     return "DONE"
 
