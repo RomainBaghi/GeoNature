@@ -684,45 +684,44 @@ def get_color_taxon():
     return [d.as_dict() for d in q.all()]
 
 
+from geonature.core.gn_permissions.models import VUsersPermissions
+import json
+
+
 @routes.route("/test", methods=["GET"])
 @json_resp
-def test():
-    from shapely.geometry import asShape
-    from geoalchemy2.shape import from_shape
-    from shapely.geometry import Point
-    import random
+# décorateur qui check le cruved sur le type de filtre "PERMISSION"
+# le 2eme parametre (True), ajoute automatiquement le parametre "info_user" à la fonction test
+@permissions.check_cruved_scope("R", True, module_code="SYNTHESE")
+def test(info_role):
+    print(info_role)
+    print(info_role.id_role)
+    #
+    q_permissions = (
+        DB.session.query(VUsersPermissions)
+        .filter(VUsersPermissions.code_filter_type == "TAXONOMIC")
+        .filter(VUsersPermissions.id_role == info_role.id_role)
+        # on peut ici aussi filtrer par module
+    )
+    data = q_permissions.all()
+    # on ajoute les differents filtres taxo dans un tableau (il peu y en avoir plusieur)
+    taxonomic_filters = []
+    for d in data:
+        # on pousse dans le tableau en transformant en dictionnaire
+        print(d.value_filter)
+        taxonomic_filters.append(json.loads(d.value_filter))
+    query_synthese = DB.session.query(Synthese)
+    # filter la requete des données avec le résultat du filtre TAXO
+    query_synthese = query_synthese.join(Taxref, Taxref.cd_nom == Synthese.cd_nom)
+    print(taxonomic_filters)
+    for t_filter in taxonomic_filters:
+        pass
+    # try a mettre si on trouve pas la colonne
+    for key, value in t_filter.items():
+        # on récupert la colonne taxref sur laquel on veut filrer
+        attr = getattr(Taxref, key)
+        # on applique le where
+        query_synthese = query_synthese.filter(attr == value)
+    print(query_synthese)
+    return "DONE"
 
-    s = DB.session.query(Synthese).get(86510)
-
-    s_as_dict = s.as_dict()
-    s_as_dict.pop("unique_id_sinp")
-    # wkt = asShape(s.the_geom_4326)
-    # print(wkt)
-    # releve.geom_4326 = from_shape(shape, srid=4326)
-
-    DB.session.query()
-    for i in range(4000):
-        new_point = Point(random.uniform(6.1, 7.5), random.uniform(44.0, 45.2))
-        wkb = from_shape(new_point, 4326)
-        s_as_dict["id_synthese"] = random.randint(1500, 9999999)
-
-        # with random cd_nom
-        random_cd_nom = DB.engine.execute(
-            """
-        SELECT cd_nom FROM taxonomie.bib_noms OFFSET random() * (select count(*) from taxonomie.bib_noms) limit 1 ;"""
-        )
-        cd_nom = None
-        for cd in random_cd_nom:
-            s_as_dict["cd_nom"] = cd[0]
-        new_synthese = Synthese(**s_as_dict)
-        new_synthese.the_geom_4326 = wkb
-
-        q = DB.session.add(new_synthese)
-        # DB.session.flush()
-        DB.session.commit()
-
-    # s = TSources(name_source="lalala")
-
-    DB.session.add(s)
-    DB.session.commit()
-    return "la"
