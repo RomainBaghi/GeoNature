@@ -280,7 +280,6 @@ def get_or_fetch_user_cruved(
         session[module_code]['user_cruved'] = user_cruved
     return user_cruved
 
-
 def get_taxonomic_filter_per_role(user):
     """
     (Fct to be rewritten as decorator)
