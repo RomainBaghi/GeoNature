@@ -78,6 +78,7 @@ def get_synthese_data(info_role):
                 VSyntheseValidation.nom_vern,
                 VSyntheseValidation.lb_nom,
                 VSyntheseValidation.cd_nom,
+                VSyntheseValidation.comment_context,
                 VSyntheseValidation.comment_description,
                 VSyntheseValidation.altitude_min,
                 VSyntheseValidation.altitude_max,
