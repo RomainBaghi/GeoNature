@@ -67,6 +67,31 @@ $BODY$
 --USAGE
 --SELECT gn_commons.check_entity_value_exist('pr_occtax.t_releves_occtax.id_releve_occtax', 2);
 
+
+CREATE OR REPLACE FUNCTION gn_commons.check_entity_uuid_exist(myentity character varying, myvalue uuid)
+  RETURNS boolean AS
+$BODY$
+--Function that allows to check if a uuid exists in the field of a table type.
+--USAGE : SELECT gn_commons.check_entity_uuid_exist('schema.table.field', uuid);
+  DECLARE
+    entity_array character varying(255)[];
+    r record;
+    _row_ct integer;
+  BEGIN
+
+
+    entity_array = string_to_array(myentity,'.');
+    EXECUTE 'SELECT '||entity_array[3]|| ' FROM '||entity_array[1]||'.'||entity_array[2]||' WHERE '||entity_array[3]||'=''' ||myvalue || '''' INTO r;
+    GET DIAGNOSTICS _row_ct = ROW_COUNT;
+      IF _row_ct > 0 THEN
+        RETURN true;
+      END IF;
+    RETURN false;
+  END;
+$BODY$
+  LANGUAGE plpgsql IMMUTABLE
+  COST 100;
+
 CREATE OR REPLACE FUNCTION get_table_location_id(myschema text, mytable text)
   RETURNS integer AS
 $BODY$
@@ -342,7 +367,9 @@ CREATE TABLE t_medias
   description_it text,
   description_es text,
   description_de text,
-  is_public boolean NOT NULL DEFAULT true
+  is_public boolean NOT NULL DEFAULT true,
+  meta_create_date timestamp without time zone DEFAULT now(),
+  meta_update_date timestamp without time zone DEFAULT now()
 );
 COMMENT ON COLUMN t_medias.id_nomenclature_media_type IS 'Correspondance nomenclature GEONATURE = TYPE_MEDIA (117)';
 
@@ -355,6 +382,12 @@ CREATE SEQUENCE t_medias_id_media_seq
 ALTER SEQUENCE t_medias_id_media_seq OWNED BY t_medias.id_media;
 ALTER TABLE ONLY t_medias ALTER COLUMN id_media SET DEFAULT nextval('t_medias_id_media_seq'::regclass);
 SELECT pg_catalog.setval('t_medias_id_media_seq', 1, false);
+
+CREATE TRIGGER tri_meta_dates_change_t_medias
+  BEFORE INSERT OR UPDATE
+  ON t_medias
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.fct_trg_meta_dates_change();
 
 
 CREATE TABLE t_validations
@@ -420,19 +453,31 @@ CREATE TABLE t_modules(
   module_picto character varying(255),
   module_desc text,
   module_group character varying(50),
-  module_path character(255),
-  module_external_url character(255),
-  module_target character(10),
+  module_path character varying(255),
+  module_external_url character varying(255),
+  module_target character varying(10),
   module_comment text,
   active_frontend boolean NOT NULL,
   active_backend boolean NOT NULL,
-  module_doc_url character varying(255)
+  module_doc_url character varying(255),
+  module_order integer
 );
 COMMENT ON COLUMN t_modules.id_module IS 'PK mais aussi FK vers la table "utilisateurs.t_applications". ATTENTION de ne pas utiliser l''identifiant d''une application existante dans cette table et qui ne serait pas un module de GeoNature';
 COMMENT ON COLUMN t_modules.module_target IS 'Value = NULL ou "blank". On peux ainsi référencer des modules externes et les ouvrir dans un nouvel onglet.';
 COMMENT ON COLUMN t_modules.module_path IS 'url relative vers le module - si module interne';
 COMMENT ON COLUMN t_modules.module_external_url IS 'url absolue vers le module - si module externe (active_frontend = false)';
 -- Ne surtout pas créer de séquence sur cette table pour associer librement id_module et id_application.
+
+CREATE TABLE t_mobile_apps(
+  id_mobile_app serial,
+  app_code character varying(30),
+  relative_path_apk character varying(255),
+  url_apk character varying(255),
+  package character varying(255),
+  version_code character varying(10)
+);
+
+COMMENT ON COLUMN t_mobile_apps.app_code IS 'Code de l''application mobile. Pas de FK vers t_modules car une application mobile ne correspond pas forcement à un module GN';
 
 ---------------
 --PRIMARY KEY--
@@ -456,6 +501,8 @@ ALTER TABLE ONLY t_history_actions
 ALTER TABLE ONLY t_modules
     ADD CONSTRAINT pk_t_modules PRIMARY KEY (id_module);
 
+ALTER TABLE ONLY t_mobile_apps
+    ADD CONSTRAINT pk_t_moobile_apps PRIMARY KEY (id_mobile_app);
 
 ----------------
 --FOREIGN KEYS--
@@ -504,9 +551,21 @@ ALTER TABLE t_validations
 ALTER TABLE t_history_actions
   ADD CONSTRAINT check_t_history_actions_operation_type CHECK (operation_type IN('I','U','D'));
 
-  ALTER TABLE ONLY t_modules 
+ALTER TABLE ONLY t_modules
     ADD CONSTRAINT check_urls_not_null CHECK (module_path IS NOT NULL OR module_external_url IS NOT NULL);
-  
+
+ALTER TABLE t_modules
+    ADD CONSTRAINT unique_t_modules_module_path UNIQUE (module_path);
+
+ALTER TABLE t_modules
+    ADD CONSTRAINT unique_t_modules_module_code UNIQUE (module_code);
+
+ALTER TABLE t_mobile_apps
+    ADD CONSTRAINT unique_t_mobile_apps_app_code UNIQUE (app_code);
+
+ALTER TABLE bib_tables_location
+  ADD CONSTRAINT unique_bib_table_location_schema_name_table_name UNIQUE (schema_name, table_name);
+
 ------------
 --TRIGGERS--
 ------------
@@ -528,7 +587,7 @@ CREATE TRIGGER tri_insert_synthese_update_validation_status
 --DATAS--
 ---------
 
--- On ne défini pas d'id pour la PK, la séquence s'en charge
+-- On ne définit pas d'id pour la PK, la séquence s'en charge
 INSERT INTO bib_tables_location (table_desc, schema_name, table_name, pk_field, uuid_field_name) VALUES
 ('Regroupement de tous les médias de GeoNature', 'gn_commons', 't_medias', 'id_media', 'unique_id_media')
 ;
@@ -539,16 +598,14 @@ INSERT INTO t_parameters (id_organism, parameter_name, parameter_desc, parameter
 ,(0,'annee_ref_commune', 'Année du référentiel géographique des communes utilisé', '2017', NULL)
 ;
 
--- insertion du module parent à tous: GeoNature
+-- Insertion du module parent à tous : GeoNature
 INSERT INTO gn_commons.t_modules(id_module, module_code, module_label, module_picto, module_desc, module_path, module_target, module_comment, active_frontend, active_backend, module_doc_url) VALUES
-(0, 'GEONATURE', 'GeoNature', '', 'Module parent de tous les modules sur lequel on peut associer un CRUVED. NB: mettre active_frontend et active_backend à false pour qu''il ne s''affiche pas dans la barre latérale des modules', '/geonature', '', '', FALSE, FALSE, 'https://geonature.readthedocs.io/fr/latest/user-manual.html')
+(0, 'GEONATURE', 'GeoNature', '', 'Module parent de tous les modules sur lequel on peut associer un CRUVED. NB: mettre active_frontend et active_backend à false pour qu''il ne s''affiche pas dans la barre latérale des modules', '/geonature', '', '', FALSE, FALSE, 'http://docs.geonature.fr/user-manual.html')
 ;
--- insertion du module Admin
+-- Insertion du module Admin
 INSERT INTO gn_commons.t_modules(module_code, module_label, module_picto, module_desc, module_path, module_target, module_comment, active_frontend, active_backend, module_doc_url) VALUES
-('ADMIN', 'Admin', 'fa-cog', 'Backoffice de GeoNature', 'admin', '_self', 'Administration des métadonnées et des nomenclatures', TRUE, FALSE, 'https://geonature.readthedocs.io/fr/latest/user-manual.html#admin')
+('ADMIN', 'Admin', 'fa-cog', 'Backoffice de GeoNature', 'admin', '_self', 'Administration des métadonnées et des nomenclatures', TRUE, FALSE, 'http://docs.geonature.fr/user-manual.html#admin')
 ;
-
-
 
 ---------
 --VIEWS--
@@ -557,7 +614,7 @@ INSERT INTO gn_commons.t_modules(module_code, module_label, module_picto, module
 CREATE VIEW gn_commons.v_meta_actions_on_object AS
 WITH insert_a AS (
 	SELECT
-		id_history_action, id_table_location, uuid_attached_row, operation_type, operation_date, (table_content -> 'id_digitiser')::text::int as id_creator
+		id_history_action, id_table_location, uuid_attached_row, operation_type, operation_date, (table_content ->> 'id_digitiser')::int as id_creator
 	FROM gn_commons.t_history_actions
 	WHERE operation_type = 'I'
 ),

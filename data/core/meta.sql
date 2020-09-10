@@ -96,6 +96,7 @@ CREATE TABLE t_acquisition_frameworks (
     ecologic_or_geologic_target text,
     acquisition_framework_parent_id integer,
     is_parent boolean,
+    id_digitizer integer,
     acquisition_framework_start_date date NOT NULL,
     acquisition_framework_end_date date,
     meta_create_date timestamp without time zone NOT NULL,
@@ -189,6 +190,7 @@ CREATE TABLE t_datasets (
     id_nomenclature_resource_type integer NOT NULL DEFAULT ref_nomenclatures.get_default_nomenclature_value('RESOURCE_TYP'),
     active boolean NOT NULL DEFAULT TRUE,
     validable boolean DEFAULT TRUE,
+    id_digitizer integer,
     meta_create_date timestamp without time zone NOT NULL,
     meta_update_date timestamp without time zone
 );
@@ -309,6 +311,9 @@ ALTER TABLE ONLY cor_dataset_protocol
 --FOREIGN KEYS--
 ----------------
 
+ALTER TABLE ONLY t_acquisition_frameworks
+    ADD CONSTRAINT fk_t_acquisition_frameworks_id_digitizer FOREIGN KEY (id_digitizer) REFERENCES utilisateurs.t_roles(id_role) ON UPDATE CASCADE;
+
 ALTER TABLE ONLY cor_acquisition_framework_voletsinp
     ADD CONSTRAINT fk_cor_acquisition_framework_voletsinp_id_acquisition_framework FOREIGN KEY (id_acquisition_framework) REFERENCES t_acquisition_frameworks(id_acquisition_framework) ON UPDATE CASCADE ON DELETE NO ACTION;
 
@@ -363,6 +368,9 @@ ALTER TABLE ONLY t_datasets
 
 ALTER TABLE ONLY t_datasets
     ADD CONSTRAINT fk_t_datasets_source_status FOREIGN KEY (id_nomenclature_source_status) REFERENCES ref_nomenclatures.t_nomenclatures(id_nomenclature) ON UPDATE CASCADE;
+
+ALTER TABLE ONLY t_datasets
+    ADD CONSTRAINT fk_t_datasets_id_digitizer FOREIGN KEY (id_digitizer) REFERENCES utilisateurs.t_roles(id_role) ON UPDATE CASCADE;
 
 
 ALTER TABLE ONLY cor_dataset_actor
@@ -511,5 +519,23 @@ CREATE OR REPLACE VIEW v_acquisition_frameworks_territories AS
 -------------
 
 INSERT INTO gn_commons.t_modules(module_code, module_label, module_picto, module_desc, module_path, module_target, active_frontend, active_backend, module_doc_url) VALUES
-('METADATA', 'Metadonnées', 'fa-book', 'Module de gestion des métadonnées', 'metadata', '_self', TRUE, TRUE, 'https://geonature.readthedocs.io/fr/latest/user-manual.html#metadonnees')
+('METADATA', 'Metadonnées', 'fa-book', 'Module de gestion des métadonnées', 'metadata', '_self', TRUE, TRUE, 'http://docs.geonature.fr/user-manual.html#metadonnees')
 ;
+
+-----------------------
+--LINK WITH T_MODULES--
+-----------------------
+--Created here because gn_meta uses gn_commons (see above) and must be created after gn_commons
+CREATE TABLE gn_commons.cor_module_dataset (
+    id_module integer NOT NULL,
+    id_dataset integer NOT NULL,
+  CONSTRAINT pk_cor_module_dataset PRIMARY KEY (id_module, id_dataset),
+  CONSTRAINT fk_cor_module_dataset_id_module FOREIGN KEY (id_module)
+      REFERENCES gn_commons.t_modules (id_module) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE NO ACTION,
+  CONSTRAINT fk_cor_module_dataset_id_dataset FOREIGN KEY (id_dataset)
+      REFERENCES gn_meta.t_datasets (id_dataset) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE NO ACTION
+);
+COMMENT ON TABLE gn_commons.cor_module_dataset IS 'Define which datasets can be used in modules';
+

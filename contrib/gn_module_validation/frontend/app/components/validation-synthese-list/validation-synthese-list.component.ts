@@ -8,9 +8,9 @@ import {
   HostListener,
   AfterContentChecked,
   OnChanges,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  EventEmitter
 } from "@angular/core";
-import { GeoJSON, FeatureGroup } from "leaflet";
 import { MapService } from "@geonature_common/map/map.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { CommonService } from "@geonature_common/service/common.service";
@@ -20,8 +20,6 @@ import { DatatableComponent } from "@swimlane/ngx-datatable";
 import { ValidationModalInfoObsComponent } from "../validation-modal-info-obs/validation-modal-info-obs.component";
 import { SyntheseFormService } from "@geonature_common/form/synthese-form/synthese-form.service";
 import { SyntheseDataService } from "@geonature_common/form/synthese-form/synthese-data.service";
-
-import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "pnx-validation-synthese-list",
@@ -35,17 +33,15 @@ export class ValidationSyntheseListComponent
   selectedIndex: Array<number> = [];
   selectedPages = [];
   coordinates_list = []; // list of coordinates for selected rows
-  group: FeatureGroup;
   marker: MediaTrackSupportedConstraints;
   public rowNumber: number;
   private _latestWidth: number;
   public id_same_coordinates = []; // list of observation ids having same geographic coordinates
-  public validationStatus;
   public modif_text =
     "Attention données modifiées depuis la dernière validation";
   public npage;
 
-  @Input() inputSyntheseData: GeoJSON;
+  @Input() inputSyntheseData: Array<any>;
   @Input() validationStatus: Array<any>;
   @ViewChild("table") table: DatatableComponent;
   @Output() pageChange: EventEmitter<number>;
@@ -60,15 +56,15 @@ export class ValidationSyntheseListComponent
     public ref: ChangeDetectorRef,
     private _ms: MapService,
     public formService: SyntheseFormService,
-    private toastr: ToastrService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     // get wiewport height to set the number of rows in the tabl
     const h = document.documentElement.clientHeight;
     this.rowNumber = Math.trunc(h / 37);
 
-    this.group = new FeatureGroup();
+    // this.group = new FeatureGroup();
     this.onMapClick();
     this.onTableClick();
     this.npage = 1;
@@ -77,34 +73,42 @@ export class ValidationSyntheseListComponent
   onMapClick() {
     this.mapListService.onMapClik$.subscribe(id => {
       // create list of observation ids having coordinates = to id value
+
+
       const selected_id_coordinates = this.mapListService.layerDict[id].feature
         .geometry.coordinates;
       this.id_same_coordinates = [];
-      for (let obs in this.mapListService.geojsonData.features) {
-        if (
-          JSON.stringify(selected_id_coordinates) ==
-          JSON.stringify(
-            this.mapListService.geojsonData.features[obs].geometry.coordinates
-          )
-        ) {
-          this.id_same_coordinates.push(
-            parseInt(this.mapListService.geojsonData.features[obs].id)
-          );
-        }
-      }
+
+      // for (let obs in this.mapListService.geojsonData.features) {
+      //   console.log(obs);
+
+      //   if (
+      //     JSON.stringify(selected_id_coordinates) ==
+      //     JSON.stringify(
+      //       this.mapListService.geojsonData.features[obs].geometry.coordinates
+      //     )
+      //   ) {
+      //     this.id_same_coordinates.push(
+      //       parseInt(this.mapListService.geojsonData.features[obs].id)
+      //     );
+      //   }
+      // }
 
       // select rows having id_synthese = to one of the id_same_coordinates values
       this.mapListService.selectedRow = [];
-      for (let id of this.id_same_coordinates) {
-        for (let i = 0; i < this.mapListService.tableData.length; i++) {
-          if (this.mapListService.tableData[i]["id_synthese"] === id) {
-            this.mapListService.selectedRow.push(
-              this.mapListService.tableData[i]
-            );
-          }
+      for (let i = 0; i < this.mapListService.tableData.length; i++) {
+        if (this.mapListService.tableData[i]["id_synthese"] === id) {
+          this.mapListService.selectedRow.push(
+            this.mapListService.tableData[i]
+          );
+          break;
         }
+        const page = Math.trunc(i / this.rowNumber);
+
+        this.table.offset = page;
       }
-      this.setSelectedObs();
+
+      //this.setSelectedObs();
     });
   }
 
@@ -120,6 +124,7 @@ export class ValidationSyntheseListComponent
   ngAfterContentChecked() {
     if (this.table && this.table.element.clientWidth !== this._latestWidth) {
       this._latestWidth = this.table.element.clientWidth;
+      this.table.recalculate();
     }
   }
 
@@ -175,13 +180,9 @@ export class ValidationSyntheseListComponent
   }
 
   viewFitList(id_observations) {
-    // create an empty featre group
-    // and fill it with the selected layer to get bounds
-    this.group = new FeatureGroup();
-    id_observations.forEach(id_obs => {
-      this.group.addLayer(this.mapListService.layerDict[id_obs]);
-    });
-    this._ms.getMap().fitBounds(this.group.getBounds());
+    if (id_observations.length) {
+      this.mapListService.zoomOnSeveralSelectedLayers(this._ms.map, id_observations);
+    }
   }
 
   setSelectedObs() {
@@ -286,5 +287,15 @@ export class ValidationSyntheseListComponent
       }
       this.mapListService.selectedRow = [...this.mapListService.selectedRow];
     });
+  }
+
+  getValidationStatusMnemonique(code) {
+    var statusF = this.validationStatus.filter((st) => st.cd_nomenclature  == code);
+    if (statusF.length > 0) {
+      return statusF[0].mnemonique;
+    }
+    else {
+      return null;
+    }
   }
 }

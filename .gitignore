@@ -3,10 +3,10 @@ settings.ini
 config/geonature_config.toml
 
 **/conf_gn_module.toml
+**/module.config.ts
 
 log/*
 .vscode/
-**/node_modules/
 geonature_config.toml
 external_assets/
 external_modules/*
@@ -28,7 +28,11 @@ backend/run.py
 
 *.perm
 *.pem
+*.ipynb
 
+tsconfig.json
+.angulardoc.json
+Pipfile.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -144,3 +148,5 @@ install_all/install_all.log
 
 # Pycharm
 .idea/
+
+backend/static/images/taxa.png

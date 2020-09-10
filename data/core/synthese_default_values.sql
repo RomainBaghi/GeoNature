@@ -15,7 +15,7 @@ INSERT INTO defaults_nomenclatures_value (mnemonique_type, id_organism, regne, g
 ,('STATUT_BIO',0,0,0,ref_nomenclatures.get_id_nomenclature('STATUT_BIO','1'))
 ,('NATURALITE',0,0,0,ref_nomenclatures.get_id_nomenclature('NATURALITE','0'))
 ,('PREUVE_EXIST',0,0,0,ref_nomenclatures.get_id_nomenclature('PREUVE_EXIST','0'))
-,('STATUT_VALID',0,0,0,ref_nomenclatures.get_id_nomenclature('STATUT_VALID','2'))
+,('STATUT_VALID',0,0,0,ref_nomenclatures.get_id_nomenclature('STATUT_VALID','0'))
 ,('STADE_VIE',0,0,0,ref_nomenclatures.get_id_nomenclature('STADE_VIE','0'))
 ,('SEXE',0,0,0,ref_nomenclatures.get_id_nomenclature('SEXE','6'))
 ,('OBJ_DENBR',0,0,0,ref_nomenclatures.get_id_nomenclature('OBJ_DENBR','NSP'))
@@ -26,4 +26,6 @@ INSERT INTO defaults_nomenclatures_value (mnemonique_type, id_organism, regne, g
 ,('TECHNIQUE_OBS',0,0,0,ref_nomenclatures.get_id_nomenclature('TECHNIQUE_OBS','133'))
 ,('STATUT_SOURCE',0,0,0,ref_nomenclatures.get_id_nomenclature('STATUT_SOURCE','NSP'))
 ,('METH_DETERMIN',0,0,0,ref_nomenclatures.get_id_nomenclature('METH_DETERMIN','1'))
+,('OCC_COMPORTEMENT',0,0,0, ref_nomenclatures.get_id_nomenclature('OCC_COMPORTEMENT', '0'))
+
 ;

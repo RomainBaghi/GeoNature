@@ -6,7 +6,7 @@ Prérequis
 
 - Ressources minimum serveur :
 
-Un serveur Linux (Debian 8 ou 9 ou Ubuntu 16 ou 18 **architecture 64-bits**) disposant d’au moins de 4 Go RAM et de 20 Go d’espace disque.
+Un serveur Linux (Debian 9 ou 10 ou Ubuntu 16 ou 18 **architecture 64-bits**) disposant d’au moins de 4 Go RAM et de 20 Go d’espace disque.
 
 Le script global d'installation de GeoNature va aussi se charger d'installer les dépendances nécessaires : 
 
@@ -14,7 +14,7 @@ Le script global d'installation de GeoNature va aussi se charger d'installer les
 - Python 3 et dépendances Python nécessaires à l'application
 - Flask (framework web Python)
 - Apache
-- Angular 4, Angular CLI, NodeJS
+- Angular 7, Angular CLI, NodeJS
 - Librairies javascript (Leaflet, ChartJS)
 - Librairies CSS (Bootstrap, Material Design)
 
@@ -37,9 +37,7 @@ GeoNature se sert de flux internet externes durant son installation et son fonct
 Installation de l'application
 -----------------------------
 
-Ce document décrit une procédure d'installation packagée de GeoNature. 
-
-Un tutoriel vidéo détaille aussi l'installation globale de GeoNature version 2.1.1 : https://www.youtube.com/watch?v=JYgH7cV9AjE. La procédure ci-dessous reste la référence officielle à suivre. 
+Ce document décrit une procédure d'installation packagée de GeoNature.
 
 En lançant le script d'installation ci-dessous, l'application GeoNature ainsi que ses dépendances seront installées sur un seul et même serveur au sein d'une seule base de données.
 
@@ -55,13 +53,26 @@ Commencer la procédure en se connectant au serveur en SSH avec l'utilisateur li
 
 * Mettre à jour les sources-list (Debian uniquement) : 
 
-A l'installation de l'OS, les sources-list (liste des sources à partir desquelles sont téléchargés les paquets) ne sont pas toujours correctes.
+A l'installation de l'OS, les sources-list (liste des sources à partir desquelles sont téléchargés les paquets) ne sont pas toujours adaptés. Pour Debian 10, les sources-list par défaut sont compatibles et il n'est donc pas nécessaire de les compléter.
 
 ::
         
         nano /etc/apt/sources.list
 
 Coller la liste des dépôts suivants :
+
+Pour Debian 10 :
+
+::
+
+        deb http://deb.debian.org/debian buster main contrib non-free
+        deb-src http://deb.debian.org/debian buster main contrib non-free
+
+        deb http://deb.debian.org/debian-security/ buster/updates main contrib non-free
+        deb-src http://deb.debian.org/debian-security/ buster/updates main contrib non-free
+
+        deb http://deb.debian.org/debian buster-updates main contrib non-free
+        deb-src http://deb.debian.org/debian buster-updates main contrib non-free
 
 Pour Debian 9 :
 
@@ -74,13 +85,6 @@ Pour Debian 9 :
         deb http://deb.debian.org/debian stretch main contrib non-free
         deb-src http://deb.debian.org/debian stretch main contrib non-free
 
-Pour Debian 8 :
-
-::
-
-        deb http://deb.debian.org/debian/ jessie main contrib non-free
-        deb http://security.debian.org/ jessie/updates main contrib non-free
-        deb http://deb.debian.org/debian/ jessie-updates main contrib non-free
 
 * Mettre à jour de la liste des dépôts Linux :
 
@@ -116,7 +120,7 @@ Pour Debian 8 :
 
 * Configuration de la locale du serveur
 
-Certains serveurs sont livrés sans "locale" (langue par défaut). Pour l'installation de GeoNature, il est necessaire de bien configurer la locale. Si la commande ``locale`` renvoie ceci:
+Certains serveurs sont livrés sans "locale" (langue par défaut). Pour l'installation de GeoNature, il est nécessaire de bien configurer la locale. Si la commande ``locale`` renvoie ceci :
 
 ::
 
@@ -136,11 +140,11 @@ Certains serveurs sont livrés sans "locale" (langue par défaut). Pour l'instal
     LC_IDENTIFICATION="fr_FR.UTF-8"
     LC_ALL=fr_FR.UTF-8
 
-vous pouvez alors passer cette étape de configuration des locale.
+Vous pouvez alors passer cette étape de configuration des locales.
 
-Exécuter la commande ``dpkg-reconfigure locales``. Une fenêtre s'affiche dans votre console. Dans la liste déroulante, sélectionnez ``fr_FR.UTF-8 UTF-8`` avec ``Espace``, puis cliquez sur OK. Une 2ème fenêtre s'affiche avec une liste de locale activées (``fr_FR.UTF-8`` doit être présent dans la liste), confirmez votre choix, en cliquant sur OK, puis attendez que la locale s'installe.
+Sinon exécuter la commande ``dpkg-reconfigure locales``. Une fenêtre s'affiche dans votre console. Dans la liste déroulante, sélectionnez ``fr_FR.UTF-8 UTF-8`` avec ``Espace``, puis cliquez sur OK. Une 2ème fenêtre s'affiche avec une liste de locale activées (``fr_FR.UTF-8`` doit être présent dans la liste), confirmez votre choix, en cliquant sur OK, puis attendez que la locale s'installe.
 
-Passer alors sur l'utilisateur ``geonatureadmin``: ``su geonatureadmin`` et executer ensuite ces commandes:
+Passer alors sur l'utilisateur ``geonatureadmin`` avec la commande ``su geonatureadmin`` et exécuter ensuite ces commandes :
 
 ::
 
@@ -149,21 +153,23 @@ Passer alors sur l'utilisateur ``geonatureadmin``: ``su geonatureadmin`` et exec
     export LANG=fr_FR.UTF-8
 
 
-Pour la suite de la documentation et pour l'administration courante de GeoNature, **on n'utilisera plus jamais l'utilisateur** ``root`` (utiliser `geonatureadmin` dans l'exemple de la documentation. ``su geonatureadmin`` pour change d'utilisateur). Si besoin d'exécuter des commandes avec des droits d'administrateur, on les précède de ``sudo``.
+Pour la suite de la documentation et pour l'administration courante de GeoNature, **on n'utilisera plus jamais l'utilisateur** ``root`` (utiliser ``geonatureadmin`` dans l'exemple de la documentation; ``su geonatureadmin`` pour change d'utilisateur). Si besoin d'exécuter des commandes avec des droits d'administrateur, on les précède de ``sudo``.
 
-Il est d'ailleurs possible de renforcer la sécurité du serveur en bloquant la connexion SSH au serveur avec ``root``.
+Il est d'ailleurs possible de renforcer la sécurité du serveur en bloquant la connexion SSH au serveur avec l'utilisateur ``root``.
 
 Voir https://docs.ovh.com/fr/vps/conseils-securisation-vps/ pour plus d'informations sur le sécurisation du serveur (port SSH, désactiver root, fail2ban, pare-feu, sauvegarde...).
 
 Il est aussi important de configurer l'accès au serveur en HTTPS plutôt qu'en HTTP pour crypter le contenu des échanges entre le navigateur et le serveur (https://docs.ovh.com/fr/hosting/les-certificats-ssl-sur-les-hebergements-web/).
 
-* Récupérer les scripts d'installation (X.Y.Z à remplacer par le numéro de la `dernière version stable de GeoNature <https://github.com/PnEcrins/GeoNature/releases>`_). Ces scripts installent les applications GeoNature, TaxHub et UsersHub (en option) ainsi que leurs bases de données (uniquement les schémas du coeur) :
+* Se placer à la racine du ``home`` de l'utilisateur puis récupérer les scripts d'installation (X.Y.Z à remplacer par le numéro de la `dernière version stable de GeoNature <https://github.com/PnEcrins/GeoNature/releases>`_). Ces scripts installent les applications GeoNature, TaxHub et UsersHub (en option) ainsi que leurs bases de données (uniquement les schémas du coeur) :
  
 ::
-    
+
+    cd ~
     wget https://raw.githubusercontent.com/PnX-SI/GeoNature/X.Y.Z/install/install_all/install_all.ini
     wget https://raw.githubusercontent.com/PnX-SI/GeoNature/X.Y.Z/install/install_all/install_all.sh
-	
+
+*Attention* : l'installation globale fonctionne uniquement si les scripts sont placés à la racine du ``home`` de l'utilisateur courant.	
 	
 * Configurez votre installation en adaptant le fichier ``install_all.ini`` :
  
@@ -183,7 +189,14 @@ Pour la définition des numéros de version des dépendances, voir le `tableau d
     chmod +x install_all.sh
     ./install_all.sh 2>&1 | tee install_all.log
 
-Une fois l'installation terminée, les applications sont disponibles aux adresses suivantes :
+Une fois l'installation terminée, lancez la commande suivante:
+
+::
+
+    exec bash
+
+
+Les applications sont disponibles aux adresses suivantes :
 
 - http://monip.com/geonature
 - http://monip.com/taxhub/
@@ -197,9 +210,8 @@ Vous pouvez vous connecter avec l'utilisateur intégré par défaut (admin/admin
     
 :Note:
 
-    * **GeoNature-atlas** : Comme dans la V1, le script ``install_all.sh`` permettra d'installer automatiquement GeoNature-atlas (en option)
-    * Une première version de GeoNature-atlas compatible avec GeoNature V2 est disponible dans sa branche ``develop`` : https://github.com/PnEcrins/GeoNature-atlas/issues/162
-    * Suivez la procédure d'installation classique de GeoNature-atlas mais exécutez le script ``install_db_gn2.sh`` à la place de ``install_db.sh``
+    * **GeoNature-atlas** : Comme dans la V1, le script ``install_all.sh`` permettra à terme d'installer automatiquement GeoNature-atlas (en option)
+    * Une première version de GeoNature-atlas compatible avec GeoNature V2 est disponible : https://github.com/PnEcrins/GeoNature-atlas
     * Vous pouvez utiliser le schéma ``ref_geo`` de GeoNature pour votre territoire, les communes et les mailles, si vous les avez intégré dans ``ref_geo.l_areas`` au préalable.
     
 :Note:
@@ -208,8 +220,8 @@ Vous pouvez vous connecter avec l'utilisateur intégré par défaut (admin/admin
 
 Si vous rencontrez une erreur, se reporter aux fichiers de logs :
 
-- Logs de l'installation de la base de données : ``/home/myuser/geonature/var/log/geonature/install_db.log``
-- Log général de l'installation de l'application : ``/home/myuser/var/log/geonature/install_app.log``
+- Logs de l'installation de la base de données : ``/home/<MY_USER>/geonature/var/log/install_db.log``
+- Log général de l'installation de l'application : ``/home/<MY_USER>/install_all.log``
 
 
 Si vous souhaitez que GeoNature soit à la racine du serveur, ou à une autre adresse, editez le fichier de configuration Apache (``/etc/apache2/sites-available/geonature.conf``) en modifiant l'alias :
@@ -241,17 +253,17 @@ Lancez ensuite la commande ``geonature install_gn_module <mon_chemin_absolu_vers
 
 Le premier paramètre est l'emplacement absolu du module sur votre serveur et le deuxième est le chemin derrière lequel on accédera au module dans le navigateur.
 
-Exemple pour un module de validation :
+Exemple pour un module Import :
 
 ::
 
-    geonature install_gn_module /home/gn_module_validation validation
+    geonature install_gn_module /home/gn_module_import import
 
-Le module sera disponible à l'adresse ``http://mon-geonature.fr/geonature/validation``
+Le module sera disponible à l'adresse ``http://mon-geonature.fr/geonature/#/validation``
 
-L'API du module sera disponible à l'adresse ``http://mon-geonature.fr/api/geonature/validation``
+L'API du module sera disponible à l'adresse ``http://mon-geonature.fr/api/import``
 
-Cette commande éxecute les actions suivantes :
+Cette commande exécute les actions suivantes :
 
 - Vérification de la conformité de la structure du module (présence des fichiers et dossiers obligatoires)
 - Intégration du blueprint du module dans l'API de GeoNature

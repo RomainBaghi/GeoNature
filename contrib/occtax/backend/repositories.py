@@ -2,13 +2,14 @@ from sqlalchemy import or_
 from werkzeug.exceptions import NotFound
 from sqlalchemy.sql import func, and_
 from sqlalchemy.orm.exc import NoResultFound
+
 from pypnnomenclature.models import TNomenclatures
+from utils_flask_sqla.generic import testDataType
 
 from geonature.utils.env import DB
 from geonature.core.gn_commons.models import VLatestValidations
-from geonature.utils.utilssqlalchemy import testDataType
 from geonature.utils.errors import GeonatureApiError
-from .utils import get_nomenclature_filters
+from .utils import get_nomenclature_filters, is_already_joined
 
 from .models import (
     TRelevesOccurrence,
@@ -17,6 +18,7 @@ from .models import (
     corRoleRelevesOccurrence,
 )
 from geonature.core.gn_meta.models import TDatasets, CorDatasetActor
+from pypnusershub.db.models import User
 
 
 class ReleveRepository:
@@ -33,7 +35,7 @@ class ReleveRepository:
         params:
          - id_releve: integer
          - info_user: TRole object model
-        
+
         Return: 
             Tuple(the releve model, the releve as geojson)
         """
@@ -44,7 +46,7 @@ class ReleveRepository:
         releve = releve.get_releve_if_allowed(info_user)
         rel_as_geojson = releve.get_geofeature()
         # add the last validation status
-        for occ in rel_as_geojson["properties"]["t_occurrences_occtax"]:
+        for occ in rel_as_geojson.get("properties").get("t_occurrences_occtax", []):
             for count in occ.get("cor_counting_occtax", []):
                 try:
                     validation_status = (
@@ -161,7 +163,9 @@ class ReleveRepository:
             return self.filter_query_with_autorization(info_user)
 
 
-def get_query_occtax_filters(args, mappedView, q, from_generic_table=False):
+def get_query_occtax_filters(
+    args, mappedView, q, from_generic_table=False, obs_txt_column="observers_txt"
+):
     if from_generic_table:
         mappedView = mappedView.tableDef.columns
     params = args.to_dict()
@@ -175,10 +179,14 @@ def get_query_occtax_filters(args, mappedView, q, from_generic_table=False):
             TOccurrencesOccurrence.id_releve_occtax == mappedView.id_releve_occtax,
         ).filter(TOccurrencesOccurrence.cd_nom == int(params.pop("cd_nom")))
     if "observers" in params:
-        q = q.join(
-            corRoleRelevesOccurrence,
-            corRoleRelevesOccurrence.id_releve_occtax == mappedView.id_releve_occtax,
-        ).filter(corRoleRelevesOccurrence.id_role.in_(args.getlist("observers")))
+        if not is_already_joined(corRoleRelevesOccurrence, q):
+            q = q.join(
+                corRoleRelevesOccurrence,
+                corRoleRelevesOccurrence.id_releve_occtax
+                == mappedView.id_releve_occtax,
+            )
+
+        q = q.filter(corRoleRelevesOccurrence.id_role.in_(args.getlist("observers")))
         params.pop("observers")
 
     if "date_up" in params:
@@ -215,36 +223,36 @@ def get_query_occtax_filters(args, mappedView, q, from_generic_table=False):
 
     if "observers_txt" in params:
         observers_query = "%{}%".format(params.pop("observers_txt"))
-        q = q.filter(mappedView.observers_txt.ilike(observers_query))
+        q = q.filter(getattr(mappedView, obs_txt_column).ilike(observers_query))
 
     if from_generic_table:
         table_columns = mappedView
     else:
         table_columns = mappedView.__table__.columns
 
-    join_with_t_occ = False
     if "non_digital_proof" in params:
-        q = q.join(
-            TOccurrencesOccurrence,
-            mappedView.id_releve_occtax == TOccurrencesOccurrence.id_releve_occtax,
-        )
-        join_with_t_occ = True
-        q = q.filter(
-            TOccurrencesOccurrence.non_digital_proof == params.pop("non_digital_proof")
-        )
-    if "digital_proof" in params:
-        if not join_with_t_occ:
+        if not is_already_joined(TOccurrencesOccurrence, q):
             q = q.join(
                 TOccurrencesOccurrence,
                 mappedView.id_releve_occtax == TOccurrencesOccurrence.id_releve_occtax,
             )
-        join_with_t_occ = True
+        q = q.filter(
+            TOccurrencesOccurrence.non_digital_proof == params.pop("non_digital_proof")
+        )
+    if "digital_proof" in params:
+        if not is_already_joined(TOccurrencesOccurrence, q):
+            q = q.join(
+                TOccurrencesOccurrence,
+                mappedView.id_releve_occtax == TOccurrencesOccurrence.id_releve_occtax,
+            )
         q = q.filter(
             TOccurrencesOccurrence.digital_proof == params.pop("digital_proof")
         )
     # Generic Filters
     for param in params:
+        print(table_columns)
         if param in table_columns:
+            print("PASSE LA  ??????")
             col = getattr(table_columns, param)
             testT = testDataType(params[param], col.type, param)
             if testT:
@@ -254,20 +262,23 @@ def get_query_occtax_filters(args, mappedView, q, from_generic_table=False):
         params
     )
     if len(releve_filters) > 0:
-        q = q.join(
-            TRelevesOccurrence,
-            mappedView.id_releve_occtax == TRelevesOccurrence.id_releve_occtax,
-        )
+        # if not from generic table, the FROM clause is already from TRelevesOccurrences
+        if from_generic_table:
+            q = q.join(
+                TRelevesOccurrence,
+                mappedView.id_releve_occtax == TRelevesOccurrence.id_releve_occtax,
+            )
         for nomenclature in releve_filters:
             col = getattr(TRelevesOccurrence.__table__.columns, nomenclature)
             q = q.filter(col == params.pop(nomenclature))
 
     if len(occurrence_filters) > 0:
-        if not join_with_t_occ:
+        if not is_already_joined(TOccurrencesOccurrence, q):
             q = q.join(
                 TOccurrencesOccurrence,
                 mappedView.id_releve_occtax == TOccurrencesOccurrence.id_releve_occtax,
             )
+
         for nomenclature in occurrence_filters:
             col = getattr(TOccurrencesOccurrence.__table__.columns, nomenclature)
             q = q.filter(col == params.pop(nomenclature))
@@ -291,14 +302,64 @@ def get_query_occtax_filters(args, mappedView, q, from_generic_table=False):
         for nomenclature in counting_filters:
             col = getattr(CorCountingOccurrence.__table__.columns, nomenclature)
             q = q.filter(col == params.pop(nomenclature))
+    return q
+
+
+def get_query_occtax_order(orderby, mappedView, q, from_generic_table=False):
+    """
+        Permet de d'ordonner sur un champ d'une table
+        Ajout d'elements de tris spécifiques/synthétiques
+    """
+    if from_generic_table:
+        mappedView = mappedView.tableDef.columns
 
     # Order by
-    if "orderby" in params:
-        if params.get("orderby") in mappedView.__table__.columns:
-            orderCol = getattr(mappedView.__table__.columns, params["orderby"])
-        if "order" in params:
-            if params["order"] == "desc":
+    if "orderby" in orderby:
+        if orderby.get("orderby") == "date":
+            if "order" in orderby and orderby["order"] == "desc":
+                orderCol = getattr(mappedView, "date_max")
+            else:
+                orderCol = getattr(mappedView, "date_min")
+        elif (
+            orderby.get("orderby") == "nb_taxons" or orderby.get("orderby") == "taxons"
+        ):
+            sub_query = (
+                DB.session.query(
+                    TRelevesOccurrence.id_releve_occtax,
+                    DB.func.count().label("nb_taxons"),
+                )
+                .join(
+                    TOccurrencesOccurrence,
+                    TOccurrencesOccurrence.id_releve_occtax
+                    == TRelevesOccurrence.id_releve_occtax,
+                )
+                .group_by(TRelevesOccurrence.id_releve_occtax)
+                .subquery()
+            )
+            q = q.join(
+                sub_query,
+                sub_query.c.id_releve_occtax == TRelevesOccurrence.id_releve_occtax,
+            )
+            orderCol = sub_query.c.nb_taxons
+        elif orderby.get("orderby") == "dataset":
+            q = q.join(TDatasets, TDatasets.id_dataset == TRelevesOccurrence.id_dataset)
+            orderCol = TDatasets.dataset_name
+        elif orderby.get("orderby") == "observateurs":
+            q = q.join(
+                corRoleRelevesOccurrence,
+                corRoleRelevesOccurrence.id_releve_occtax
+                == TRelevesOccurrence.id_releve_occtax,
+            ).join(User, corRoleRelevesOccurrence.id_role == User.id_role)
+            orderCol = User.nom_role
+        elif orderby.get("orderby") in mappedView.__table__.columns:
+            orderCol = getattr(mappedView, orderby["orderby"])
+
+    if "orderCol" in locals():
+        if "order" in orderby:
+            if orderby["order"] == "desc":
                 orderCol = orderCol.desc()
         q = q.order_by(orderCol)
+    # ajout d'un ordre id desc obligatoire pour éviter des relevés qui se mettent sur plusieurs pages
+    q = q.order_by(getattr(mappedView, "id_releve_occtax").desc())
 
     return q

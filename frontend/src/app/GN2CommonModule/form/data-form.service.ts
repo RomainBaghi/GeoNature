@@ -1,17 +1,30 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import 'rxjs/add/operator/toPromise';
+import {
+  HttpClient,
+  HttpParams,
+  HttpEventType,
+  HttpErrorResponse,
+  HttpEvent
+} from '@angular/common/http';
 import { AppConfig } from '../../../conf/app.config';
 import { Taxon } from './taxonomy/taxonomy.component';
+import { Observable } from 'rxjs';
 
 /** Interface for queryString parameters*/
 interface ParamsDict {
   [key: string]: any;
 }
 
+export const FormatMapMime = new Map([
+  ['csv', 'text/csv'],
+  ['json', 'application/json'],
+  ['shp', 'application/zip']
+]);
+
 @Injectable()
 export class DataFormService {
-  constructor(private _http: HttpClient) {}
+  private _blob: Blob;
+  constructor(private _http: HttpClient) { }
 
   getNomenclature(
     codeNomenclatureType: string,
@@ -36,13 +49,29 @@ export class DataFormService {
     );
   }
 
-  getNomenclatures(...codesNomenclatureType) {
+  getNomenclatures(codesNomenclatureType: Array<string>) {
     let params: HttpParams = new HttpParams();
+    params = params.set('orderby', 'label_default');
     codesNomenclatureType.forEach(code => {
       params = params.append('code_type', code);
     });
+
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/nomenclatures/nomenclatures`, {
       params: params
+    });
+  }
+
+  getDefaultNomenclatureValue(path, mnemoniques: Array<string> = [], kwargs: ParamsDict = {}) {
+    let queryString: HttpParams = new HttpParams();
+    // tslint:disable-next-line:forin
+    for (const key in kwargs) {
+      queryString = queryString.set(key, kwargs[key].toString());
+    }
+    mnemoniques.forEach(mnem => {
+      queryString = queryString.append('mnemonique', mnem);
+    });
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/${path}/defaultNomenclatures`, {
+      params: queryString
     });
   }
 
@@ -66,14 +95,31 @@ export class DataFormService {
         }
       }
     }
-
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/datasets`, {
       params: queryString
     });
   }
 
+  /**
+   * Get dataset list for metadata modules
+   */
+  getAfAndDatasetListMetadata() {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/af_datasets_metadata`, {
+    });
+  }
+
+
+
+  getImports(id_dataset) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/import/by_dataset/${id_dataset}`);
+  }
+
   getObservers(idMenu) {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/users/menu/${idMenu}`);
+  }
+
+  getObserversFromCode(codeList) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/users/menu_from_code/${codeList}`);
   }
 
   autocompleteTaxon(api_endpoint: string, searh_name: string, params?: { [key: string]: string }) {
@@ -129,6 +175,27 @@ export class DataFormService {
     return this._http.get<any>(`${AppConfig.API_TAXHUB}/taxref/bib_habitats`);
   }
 
+  getTypologyHabitat(id_list: number) {
+    let params = new HttpParams();
+
+    if (id_list) {
+      params = params.set('id_list', id_list.toString());
+    }
+    return this._http
+      .get<any>(`${AppConfig.API_ENDPOINT}/habref/typo`, { params: params })
+      .map(data => {
+        // replace '_' with space because habref is super clean !
+        return data.map(d => {
+          d['lb_nom_typo'] = d['lb_nom_typo'].replace(/_/g, ' ');
+          return d;
+        });
+      });
+  }
+
+  getHabitatInfo(cd_hab) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/habref/habitat/${cd_hab}`);
+  }
+
   getGeoInfo(geojson) {
     return this._http.post<any>(`${AppConfig.API_ENDPOINT}/geo/info`, geojson);
   }
@@ -138,6 +205,10 @@ export class DataFormService {
       geojson['id_type'] = idType;
     }
     return this._http.post(`${AppConfig.API_ENDPOINT}/geo/areas`, geojson);
+  }
+
+  getAltitudes(geojson) {
+    return this._http.post(`${AppConfig.API_ENDPOINT}/geo/altitude`, geojson);
   }
 
   getFormatedGeoIntersection(geojson, idType?) {
@@ -158,6 +229,10 @@ export class DataFormService {
       });
       return areasIntersected;
     });
+  }
+
+  getAreaSize(geojson) {
+    return this._http.post<number>(`${AppConfig.API_ENDPOINT}/geo/area_size`, geojson);
   }
 
   getMunicipalities(nom_com?, limit?) {
@@ -210,8 +285,23 @@ export class DataFormService {
     });
   }
 
+  /**
+   * Return all AF with cruved for map-list
+   */
+  getAcquisitionFrameworksMetadata(orderByName = true) {
+    let queryString: HttpParams = new HttpParams();
+    if (orderByName) {
+      queryString = this.addOrderBy(queryString, 'acquisition_framework_name');
+    }
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_frameworks_metadata`, { params: queryString });
+  }
+
   getAcquisitionFramework(id_af) {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_framework/${id_af}`);
+  }
+
+  getAcquisitionFrameworkDetails(id_af) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/acquisition_framework_details/${id_af}`);
   }
 
   getOrganisms(orderByName = true) {
@@ -234,6 +324,10 @@ export class DataFormService {
     });
   }
 
+  getRole(id: number) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/users/role/${id}`);
+  }
+
   getRoles(params?: ParamsDict, orderByName = true) {
     let queryString: HttpParams = new HttpParams();
     if (orderByName) {
@@ -250,6 +344,36 @@ export class DataFormService {
 
   getDataset(id) {
     return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/dataset/${id}`);
+  }
+
+  getDatasetDetails(id) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/dataset_details/${id}`);
+  }
+
+  // getTaxaDistribution(id_dataset) {
+  //   return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/dataset_taxa_distribution/${id_dataset}`);
+  // }
+  getGeojsonData(id) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/meta/geojson_data/${id}`);
+  }
+
+  getRepartitionTaxons(id_dataset) {
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/repartition_taxons_dataset/${id_dataset}`);
+  }
+
+  uploadCanvas(img: any) {
+    return this._http.post<any>(`${AppConfig.API_ENDPOINT}/meta/upload_canvas`, img);
+  }
+  getTaxaDistribution(taxa_rank, params?: ParamsDict) {
+    let queryString = new HttpParams();
+    queryString = queryString.set('taxa_rank', taxa_rank);
+    for (let key in params) {
+      queryString = queryString.set(key, params[key])
+    }
+
+    return this._http.get<any>(`${AppConfig.API_ENDPOINT}/synthese/taxa_distribution`, {
+      params: queryString
+    });
   }
 
   getModulesList(exclude: Array<string>) {
@@ -281,4 +405,45 @@ export class DataFormService {
   addOrderBy(httpParam: HttpParams, order_column): HttpParams {
     return httpParam.append('orderby', order_column);
   }
+
+  subscribeAndDownload(
+    source: Observable<HttpEvent<Blob>>,
+    fileName: string,
+    format: string
+  ): void {
+    const subscription = source.subscribe(
+      event => {
+        if (event.type === HttpEventType.Response) {
+          this._blob = new Blob([event.body], { type: event.headers.get('Content-Type') });
+        }
+      },
+      (e: HttpErrorResponse) => {
+        //this._commonService.translateToaster('error', 'ErrorMessage');
+        //this.isDownloading = false;
+      },
+      // response OK
+      () => {
+        //this.isDownloading = false;
+        const date = new Date();
+        const extension = format === 'shapefile' ? 'zip' : format;
+        this.saveBlob(this._blob, `${fileName}_${date.toISOString()}.${extension}`);
+        subscription.unsubscribe();
+      }
+    );
+  }
+
+  saveBlob(blob, filename) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('visibility', 'hidden');
+    link.download = filename;
+    link.onload = () => {
+      URL.revokeObjectURL(link.href);
+    };
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
 }
+

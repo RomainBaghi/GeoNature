@@ -20,7 +20,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { SyntheseModalDownloadComponent } from './modal-download/modal-download.component';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { ModalInfoObsComponent } from './modal-info-obs/modal-info-obs.component';
-import { CruvedStoreService } from '../../../services/cruved-store.service';
+import { CruvedStoreService } from '../../../GN2CommonModule/service/cruved-store.service';
 
 @Component({
   selector: 'pnx-synthese-list',
@@ -50,8 +50,8 @@ export class SyntheseListComponent implements OnInit, OnChanges, AfterContentChe
     private _fs: SyntheseFormService,
     public sanitizer: DomSanitizer,
     public ref: ChangeDetectorRef,
-    private _cruvedStore: CruvedStoreService
-  ) {}
+    public _cruvedStore: CruvedStoreService
+  ) { }
 
   ngOnInit() {
     // get wiewport height to set the number of rows in the tabl

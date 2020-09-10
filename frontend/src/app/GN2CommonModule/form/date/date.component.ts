@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { NgbDateFRParserFormatter } from './ngb-date-custom-parser-formatter';
 
 export interface DateStruc {
@@ -34,11 +34,13 @@ export interface DateStruc {
     '(document:click)': 'onClick($event)'
   },
   templateUrl: 'date.component.html',
+  styleUrls: ['./date.component.scss'],
   providers: [{ provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter }]
 })
 export class DateComponent implements OnInit, OnDestroy {
   public elementRef: ElementRef;
   @Input() label: string;
+  @Input() isInvalid: string;
   @Input() disabled: boolean;
   @Input() parentFormControl: FormControl;
   @Input() defaultToday = false;

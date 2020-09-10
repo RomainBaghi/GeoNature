@@ -9,7 +9,7 @@ Prérequis
 
 Ressources minimum serveur :
 
-- Un serveur Linux **architecture 64-bits** disposant d’au moins de 2 Go RAM et de 20 Go d’espace disque.
+- Un serveur Linux **architecture 64-bits** disposant d’au moins de 4 Go RAM et de 20 Go d’espace disque.
 
 GeoNature utilise les technologies suivantes:
 
@@ -17,7 +17,7 @@ GeoNature utilise les technologies suivantes:
 - Python 3 et dépendances Python nécessaires à l'application
 - Flask (framework web Python)
 - Apache
-- Angular 4, Angular CLI, NodeJS
+- Angular 7, Angular CLI, NodeJS
 - Librairies javascript (Leaflet, ChartJS)
 - Librairies CSS (Bootstrap, Material Design)
 
@@ -48,19 +48,38 @@ Commencer la procédure en se connectant au serveur en SSH avec l'utilisateur li
 
 * Se reconnecter en SSH au serveur avec le nouvel utilisateur pour ne pas faire l'installation en ``root``. On ne se connectera plus en ``root``. Si besoin d'éxecuter des commandes avec des droits d'administrateur, on les précède de ``sudo``. Il est d'ailleurs possible renforcer la sécurité du serveur en bloquant la connexion SSH au serveur avec root. Voir https://docs.ovh.com/fr/vps/conseils-securisation-vps/ pour plus d'informations sur le sécurisation du serveur.
 
-* Lancez les commandes suivantes pour installer les dépendances de GeoNature (debian 9) :
+* Installer python 3.8
+
+  ::
+
+    cd /opt
+    sudo wget https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tgz
+    sudo tar xzf Python-3.8.3.tgz
+    cd Python-3.8.3
+    sudo ./configure --enable-optimizations
+    sudo make install
+
+* Lancez les commandes suivantes pour installer les dépendances de GeoNature (Debian 9) :
 
   ::  
     
-    sudo apt-get install wget
+    sudo apt-get install wget git
     sudo apt-get install -y postgresql postgis postgresql-server-dev-9.6
-    sudo apt-get install -y python3 python3-dev python3-setuptools python-pip libpq-dev libgdal-dev python-gdal python-virtualenv build-essential
-    sudo pip install --upgrade pip virtualenv virtualenvwrapper
-    sudo apt-get install -y npm
+    sudo apt-get install -y python3 python3-dev python3-setuptools python-pip libpq-dev libgdal-dev python-gdal build-essential
+    sudo apt-get install -y python3-wheel python3-cffi libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+    python3 -m pip install pip==20.0.2
+    pip3 install virtualenv==20.0.1
     sudo apt-get install -y supervisor
     sudo apt-get install -y apache2
+    # installation de NVM
+    wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
+
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
     
-Sur Ubuntu 18, installez la version 10 de postgresql-server-dev ``sudo apt-get install postgresql-server-dev-10``. La version est à adapter sur les autres versions de Debian ou Ubuntu
+Sur Ubuntu 18, installez la version 10 de postgresql-server-dev ``sudo apt-get install postgresql-server-dev-10``. La version est à adapter sur les autres versions de Debian ou Ubuntu.
 
 Installation de l'application
 -----------------------------
@@ -84,7 +103,7 @@ Installation de l'application
 
   ::
 
-    mv GeoNature-X.Y.Z /home/<mon_user>/geonature/
+    mv GeoNature-X.Y.Z /home/`whoami`/geonature/
     cd geonature
 
 * Copier puis mettre à jour le fichier de configuration (``config/settings.ini``) comportant les informations relatives à votre environnement serveur :
@@ -123,7 +142,7 @@ La commande ``install_app.sh`` comporte deux paramètres optionnels qui doivent 
 - ``-h`` ou ``--help`` affiche l'aide pour cette commande ``install_app.sh``
 
 ::
-
+    
     touch ../var/log/install_app.log
     ./install_app.sh 2>&1 | tee ../var/log/install_app.log
 
@@ -198,24 +217,29 @@ Télécharger Taxhub depuis le dépôt github depuis la racine de votre utilisat
     cd ~
     wget https://github.com/PnX-SI/TaxHub/archive/X.Y.Z.zip
     unzip X.Y.Z.zip
+    rm X.Y.Z.zip
     
 en mode développeur: 
 
 ``https://github.com/PnX-SI/TaxHub.git``
 
-Rendez vous dans le répertoire téléchargé et dézippé, puis "désamplez" le fichier ``settings.ini`` et remplissez la configuration avec les paramètres de connexion à la BDD GeoNature précedemment installée
+Rendez vous dans le répertoire téléchargé et dézippé, puis "désamplez" le fichier ``settings.ini`` et remplissez la configuration avec les paramètres de connexion à la BDD GeoNature précedemment installée :
 
 ::
 
     cp settings.ini.sample settings.ini
     nano settings.ini
 
-Lancer le script d'installation de l'application:
-::
-    touch var/log/install_app.log
-    ./install_app.sh 2>&1 | tee install_all.log
+Lancer le script d'installation de l'application :
 
-Suite à l'execution de ce script, l'application Taxhub a été lancé automatiquement par le superviseur et est disponible à l'adresse ``127.0.0.1:5000`` (et l'API, à ``127.0.0.1:5000//api``)
+::
+
+    mkdir var 
+    mkdir var/log
+    touch var/log/install_app.log
+    ./install_app.sh 2>&1 | tee var/log/install_app.log
+
+Suite à l'execution de ce script, l'application Taxhub a été lancé automatiquement par le superviseur et est disponible à l'adresse ``127.0.0.1:5000`` (et l'API, à ``127.0.0.1:5000/api``)
 
 Voir la doc d'installation de TaxHub : http://taxhub.readthedocs.io/
 
@@ -224,7 +248,7 @@ Voir la doc d'installation de UsersHub : http://usershub.readthedocs.io/
 Mise à jour de l'application
 ----------------------------
 
-Attention, avec chaque mise à jour, il est important de sauvegarde l'application et sa base de données, ou de faire un snapshot du serveur pour pouvoir revenir à son état antérieure avant mise à jour en cas de problème.
+Attention, avant chaque mise à jour, il est important de sauvegarder l'application et sa base de données, ou de faire un snapshot du serveur pour pouvoir revenir à son état antérieure avant mise à jour en cas de problème.
 
 La mise à jour de GeoNature consiste à télécharger sa nouvelle version dans un nouveau répertoire, récupérer les fichiers de configuration et de surcouche depuis la version actuelle et de relancer l'installation dans le répertoire de la nouvelle version. 
 
@@ -244,12 +268,11 @@ La mise à jour de GeoNature consiste à télécharger sa nouvelle version dans 
     mv GeoNature-X.Y.Z /home/`whoami`/geonature/
     cd geonature
 
-* Suivez les éventuelles notes de version décrites ici : https://github.com/PnX-SI/GeoNature/releases.
+* Suivez les éventuelles notes de version spécifiques décrites au niveau de chaque version : https://github.com/PnX-SI/GeoNature/releases.
 
-⚠️ Si la release inclut des scripts de migration SQL : *lancer ces scripts avec l'utilisateur de BDD courant* (généralement ``geonatadmin``) et non le super-utilisateur ``postgres``.
+⚠️ Si la realease inclut des scripts de migration SQL : *lancer ces scripts avec l'utilisateur de BDD courant* (généralement ``geonatadmin``) et non le super-utilisateur ``postgres``.
 
-Sauf mentions contraires dans les notes de version, vous pouvez sauter des versions mais en suivant bien les différentes notes de versions et notamment les scripts de mise à jour de la base de données à exécuter successivement.
-
+Sauf mentions contraires dans les notes de version, vous pouvez sauter des versions mais en suivant bien les différentes notes de versions intermédiaires et notamment les scripts de mise à jour de la base de données à exécuter successivement.
 
 * Si vous devez aussi mettre à jour TaxHub et/ou UsersHub, suivez leurs notes de versions mais aussi leur documentation (https://usershub.readthedocs.io et https://taxhub.readthedocs.io).
 

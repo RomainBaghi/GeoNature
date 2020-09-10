@@ -2,7 +2,10 @@
 Fonctions utilitaires
 """
 import json
+import csv
+import io
 from functools import wraps
+import uuid
 
 from dateutil import parser
 from flask import Response
@@ -19,6 +22,18 @@ from geoalchemy2.shape import to_shape
 from geonature.utils.env import DB
 from geonature.utils.errors import GeonatureApiError
 from geonature.utils.utilsgeometry import create_shapes_generic
+
+
+def test_is_uuid(uuid_string, version=4):
+    try:
+        # Si uuid_string est un code hex valide mais pas un uuid valid,
+        # UUID() va quand même le convertir en uuid valide. Pour se prémunir
+        # de ce problème, on check la version original (sans les tirets) avec
+        # le code hex généré qui doivent être les mêmes.
+        uid = uuid.UUID(uuid_string, version=version)
+        return uid.hex == uuid_string.replace('-', '')
+    except ValueError:
+        return False
 
 
 def testDataType(value, sqlType, paramName):
@@ -333,7 +348,7 @@ def serializeQuery(data, columnDef):
         {
             c["name"]: getattr(row, c["name"])
             for c in columnDef
-            if getattr(row, c["name"]) is not None
+            if getattr(row, (c["name"] if c["name"] else ""), None) is not None
         }
         for row in data
     ]
@@ -365,6 +380,9 @@ def serializeQueryTest(data, column_def):
     return rows
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def serializable(cls):
     """
         Décorateur de classe pour les DB.Models
@@ -395,7 +413,7 @@ def serializable(cls):
         (db_rel.key, db_rel.uselist) for db_rel in cls.__mapper__.relationships
     ]
 
-    def serializefn(self, recursif=False, columns=()):
+    def serializefn(self, recursif=False, columns=(), relationships=()):
         """
         Méthode qui renvoie les données de l'objet sous la forme d'un dict
 
@@ -406,20 +424,30 @@ def serializable(cls):
                 soit également sérialisé
             columns: liste
                 liste des colonnes qui doivent être prises en compte
+            relationships: liste
+                liste des relationships qui doivent être prise en compte
         """
         if columns:
             fprops = list(filter(lambda d: d[0] in columns, cls_db_columns))
         else:
             fprops = cls_db_columns
-
+        if relationships:
+            selected_relationship = list(
+                filter(lambda d: d[0] in relationships, cls_db_relationships)
+            )
+        else:
+            selected_relationship = cls_db_relationships
         out = {item: _serializer(getattr(self, item)) for item, _serializer in fprops}
         if recursif is False:
             return out
 
-        for (rel, uselist) in cls_db_relationships:
+        for (rel, uselist) in selected_relationship:
             if getattr(self, rel):
                 if uselist is True:
-                    out[rel] = [x.as_dict(recursif) for x in getattr(self, rel)]
+                    out[rel] = [
+                        x.as_dict(recursif, relationships=relationships)
+                        for x in getattr(self, rel)
+                    ]
                 else:
                     out[rel] = getattr(self, rel).as_dict(recursif)
 
@@ -435,7 +463,9 @@ def geoserializable(cls):
         Permet de rajouter la fonction as_geofeature à une classe
     """
 
-    def serializegeofn(self, geoCol, idCol, recursif=False, columns=()):
+    def serializegeofn(
+        self, geoCol, idCol, recursif=False, columns=(), relationships=()
+    ):
         """
         Méthode qui renvoie les données de l'objet sous la forme
         d'une Feature geojson
@@ -460,7 +490,7 @@ def geoserializable(cls):
         feature = Feature(
             id=str(getattr(self, idCol)),
             geometry=geometry,
-            properties=self.as_dict(recursif, columns),
+            properties=self.as_dict(recursif, columns, relationships),
         )
         return feature
 
@@ -468,6 +498,9 @@ def geoserializable(cls):
     return cls
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def json_resp(fn):
     """
     Décorateur transformant le résultat renvoyé par une vue
@@ -485,6 +518,9 @@ def json_resp(fn):
     return _json_resp
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def to_json_resp(
     res, status=200, filename=None, as_file=False, indent=None, extension="json"
 ):
@@ -509,6 +545,9 @@ def to_json_resp(
     )
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def csv_resp(fn):
     """
     Décorateur transformant le résultat renvoyé en un fichier csv
@@ -523,6 +562,9 @@ def csv_resp(fn):
     return _csv_resp
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def to_csv_resp(filename, data, columns, separator=";"):
 
     headers = Headers()
@@ -534,11 +576,17 @@ def to_csv_resp(filename, data, columns, separator=";"):
     return Response(out, headers=headers)
 
 
+################################################################################
+# ATTENTION NON MAINTENTU - PREFERER LA MËME FONCTION DU LA LIB utils_flask_sqla
+################################################################################
 def generate_csv_content(columns, data, separator):
-    outdata = [separator.join(columns)]
-    for o in data:
-        outdata.append(
-            separator.join('"%s"' % (o.get(i), "")[o.get(i) is None] for i in columns)
-        )
-    out = "\r\n".join(outdata)
-    return out
+    fp = io.StringIO()
+    writer = csv.DictWriter(
+        fp, columns, delimiter=separator, quoting=csv.QUOTE_ALL, extrasaction="ignore"
+    )
+    writer.writeheader()  # ligne d'entête
+
+    for line in data:
+        writer.writerow(line)
+    fp.seek(0)  # Rembobinage du "fichier"
+    return fp.read()  # Retourne une chaine

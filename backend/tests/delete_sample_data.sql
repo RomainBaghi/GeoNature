@@ -20,3 +20,13 @@ SELECT pg_catalog.setval('gn_synthese.synthese_id_synthese_seq', 1, true);
 -- remove custom filters from gn_permissions.t_filters
 DELETE FROM gn_permissions.t_filters WHERE id_filter = 500;
 
+-- test register 
+DELETE FROM utilisateurs.t_roles WHERE identifiant = 'hello_test';
+DELETE FROM utilisateurs.temp_users WHERE identifiant = 'hello_test';
+
+
+----------------
+-- GN_COMMONS --
+----------------
+
+DELETE FROM gn_commons.t_mobile_apps;

@@ -1,15 +1,15 @@
 import { Router } from '@angular/router';
-//import * as firebase from 'firebase';
+import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { ToastrService, ToastrConfig } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { AppConfig } from '../../../conf/app.config';
 import { CookieService } from 'ng2-cookies';
+import 'rxjs/add/operator/delay';
 
 export interface User {
   user_login: string;
   id_role: string;
-  id_organisme: string;
+  id_organisme: number;
   prenom_role?: string;
   nom_role?: string;
   nom_complet?: string;
@@ -20,7 +20,6 @@ export class AuthService {
   authentified = false;
   currentUser: any;
   token: string;
-  toastrConfig: ToastrConfig;
   loginError: boolean;
   public isLoading = false;
   constructor(private router: Router, private _http: HttpClient, private _cookie: CookieService) {}
@@ -53,15 +52,32 @@ export class AuthService {
     return response;
   }
 
-  signinUser(username: string, password: string) {
+  checkUserExist(username: string): Observable<any> {
+    const options = {
+      identifiant: username,
+      id_application: AppConfig.ID_APPLICATION_GEONATURE
+    };
+    return this._http.post<any>(`${AppConfig.API_ENDPOINT}/auth/login/check`, options);
+  }
+
+  loginOrPwdRecovery(data: any): Observable<any> {
+    return this._http.post<any>(`${AppConfig.API_ENDPOINT}/users/login/recovery`, data);
+  }
+
+  passwordChange(data: any): Observable<any> {
+    return this._http.put<any>(`${AppConfig.API_ENDPOINT}/users/password/new`, data);
+  }
+
+  signinUser(user: any) {
     this.isLoading = true;
-    const user = {
-      login: username,
-      password: password,
+
+    const options = {
+      login: user.username,
+      password: user.password,
       id_application: AppConfig.ID_APPLICATION_GEONATURE
     };
     this._http
-      .post<any>(`${AppConfig.API_ENDPOINT}/auth/login`, user)
+      .post<any>(`${AppConfig.API_ENDPOINT}/auth/login`, options)
       .finally(() => (this.isLoading = false))
       .subscribe(
         data => {
@@ -82,6 +98,11 @@ export class AuthService {
           this.loginError = true;
         }
       );
+  }
+
+  signupUser(data: any): Observable<any> {
+    const options = data;
+    return this._http.post<any>(`${AppConfig.API_ENDPOINT}/users/inscription`, options);
   }
 
   decodeObjectCookies(val) {

@@ -2,8 +2,6 @@ import {
   Component,
   OnInit,
   Input,
-  Output,
-  EventEmitter,
   OnChanges,
   DoCheck,
   IterableDiffers,
@@ -52,6 +50,12 @@ export class DatasetsComponent extends GenericFormComponent implements OnInit, O
    * Booléan qui controle si on affiche seulement les JDD actifs ou également ceux qui sont inatif
    */
   @Input() displayOnlyActive: boolean = true;
+
+  /**
+   * code du module pour n'afficher que les JDD associés au module
+   */
+  @Input() moduleCode: string;
+
   constructor(
     private _dfs: DataFormService,
     private _commonService: CommonService,
@@ -71,10 +75,14 @@ export class DatasetsComponent extends GenericFormComponent implements OnInit, O
     if (this.displayOnlyActive) {
       params['active'] = true;
     }
+    if (this.moduleCode) {
+      params['module_code'] = this.moduleCode;
+    }
     this._dfs.getDatasets((params = params)).subscribe(
       res => {
         this.dataSets = res.data;
         this.savedDatasets = res.data;
+        this.valueLoaded.emit({ value: this.savedDatasets })
         if (res['with_mtd_errors']) {
           this._commonService.translateToaster('error', 'MetaData.JddErrorMTD');
         }

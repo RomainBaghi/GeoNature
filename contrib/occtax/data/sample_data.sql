@@ -66,6 +66,7 @@ INSERT INTO gn_meta.t_datasets (
     id_nomenclature_data_origin,
     id_nomenclature_source_status,
     id_nomenclature_resource_type,
+    active,
     validable,
     meta_create_date,
     meta_update_date
@@ -91,6 +92,7 @@ INSERT INTO gn_meta.t_datasets (
     ref_nomenclatures.get_id_nomenclature('STATUT_SOURCE', 'Te'),
     ref_nomenclatures.get_id_nomenclature('RESOURCE_TYP', '1'),
     true,
+    true,
     '2018-09-01 16:57:44.45879',
     null
     ),
@@ -113,6 +115,7 @@ INSERT INTO gn_meta.t_datasets (
     ref_nomenclatures.get_id_nomenclature('DS_PUBLIQUE', 'Pu'),
     ref_nomenclatures.get_id_nomenclature('STATUT_SOURCE', 'Te'),
     ref_nomenclatures.get_id_nomenclature('RESOURCE_TYP', '1'),
+    true,
     true,
     '2018-09-01 16:59:03.25687',
     null
@@ -173,13 +176,68 @@ INSERT INTO gn_meta.cor_dataset_protocol (id_dataset, id_protocol) VALUES
 ;
 SELECT pg_catalog.setval('gn_meta.sinp_datatype_protocols_id_protocol_seq', (SELECT max(id_protocol)+1 FROM gn_meta.cor_dataset_protocol), true);
 
+INSERT INTO gn_commons.cor_module_dataset (id_module, id_dataset)
+SELECT gn_commons.get_id_module_bycode('OCCTAX'), id_dataset
+FROM gn_meta.t_datasets
+WHERE active;
+
 -- Insérer 2 relevés d'exemple dans Occtax
 
-INSERT INTO pr_occtax.t_releves_occtax (id_releve_occtax,id_dataset,id_digitiser,id_nomenclature_obs_technique,id_nomenclature_grp_typ,date_min,date_max,hour_min,hour_max,altitude_min,altitude_max,meta_device_entry,comment,geom_local,geom_4326,precision) VALUES
-(1,(SELECT id_dataset FROM gn_meta.t_datasets WHERE unique_dataset_id='4d331cae-65e4-4948-b0b2-a11bc5bb46c2')
-  ,1,ref_nomenclatures.get_id_nomenclature('TECHNIQUE_OBS', '133'),ref_nomenclatures.get_id_nomenclature('TYP_GRP', 'OBS'),'2017-01-01','2017-01-01','12:05:02','12:05:02',1500,1565,'web','Exemple test','01010000206A0800002E988D737BCC2D41ECFA38A659805841','0101000020E61000000000000000001A40CDCCCCCCCC6C4640',10)
-,(2,(SELECT id_dataset FROM gn_meta.t_datasets WHERE unique_dataset_id='4d331cae-65e4-4948-b0b2-a11bc5bb46c2')
-  ,1,ref_nomenclatures.get_id_nomenclature('TECHNIQUE_OBS', '133'),ref_nomenclatures.get_id_nomenclature('TYP_GRP', 'OBS'),'2017-01-08','2017-01-08','20:00:00','23:00:00',1600,1600,'web','Autre exemple test','01010000206A0800002E988D737BCC2D41ECFA38A659805841','0101000020E61000000000000000001A40CDCCCCCCCC6C4640',100);
+INSERT INTO pr_occtax.t_releves_occtax (
+  id_releve_occtax,
+  id_dataset,
+  id_digitiser,
+  id_nomenclature_tech_collect_campanule,
+  id_nomenclature_grp_typ,
+  id_nomenclature_geo_object_nature,
+  date_min,
+  date_max,
+  hour_min,
+  hour_max,
+  altitude_min,
+  altitude_max,
+  meta_device_entry,
+  comment,
+  geom_local,
+  geom_4326,
+  precision
+  ) VALUES (
+      1,
+      (SELECT id_dataset FROM gn_meta.t_datasets WHERE unique_dataset_id='4d331cae-65e4-4948-b0b2-a11bc5bb46c2'),
+      1,
+      ref_nomenclatures.get_id_nomenclature('TECHNIQUE_OBS', '133'),
+      ref_nomenclatures.get_id_nomenclature('TYP_GRP','OBS'),
+      ref_nomenclatures.get_id_nomenclature('NAT_OBJ_GEO','In'), -- ?
+      '2017-01-01',
+      '2017-01-01',
+      '12:05:02',
+      '12:05:02',
+      1500,
+      1565,
+      'web',
+      'Exemple test',
+      '01010000206A0800002E988D737BCC2D41ECFA38A659805841',
+      '0101000020E61000000000000000001A40CDCCCCCCCC6C4640',
+      10),
+      (
+      2,
+      (SELECT id_dataset FROM gn_meta.t_datasets WHERE unique_dataset_id='4d331cae-65e4-4948-b0b2-a11bc5bb46c2'),
+      1,
+      ref_nomenclatures.get_id_nomenclature('TECHNIQUE_OBS', '133'),
+      ref_nomenclatures.get_id_nomenclature('TYP_GRP', 'OBS'),
+      ref_nomenclatures.get_id_nomenclature('NAT_OBJ_GEO','In'), -- ?
+      '2017-01-08',
+      '2017-01-08',
+      '20:00:00',
+      '23:00:00',
+      1600,
+      1600,
+      'web',
+      'Autre exemple test',
+      '01010000206A0800002E988D737BCC2D41ECFA38A659805841',
+      '0101000020E61000000000000000001A40CDCCCCCCCC6C4640',
+      100
+  );
 SELECT pg_catalog.setval('pr_occtax.t_releves_occtax_id_releve_occtax_seq', (SELECT max(id_releve_occtax)+1 FROM pr_occtax.t_releves_occtax), true);
 
 -- Insérer 3 occurrences dans les 2 relevés Occtax
@@ -187,12 +245,11 @@ SELECT pg_catalog.setval('pr_occtax.t_releves_occtax_id_releve_occtax_seq', (SEL
 INSERT INTO pr_occtax.t_occurrences_occtax  (
     id_occurrence_occtax,
     id_releve_occtax,
-    id_nomenclature_obs_meth,
+    id_nomenclature_obs_technique,
     id_nomenclature_bio_condition,
     id_nomenclature_bio_status,
     id_nomenclature_naturalness,
     id_nomenclature_exist_proof,
-    id_nomenclature_diffusion_level,
     id_nomenclature_observation_status,
     id_nomenclature_blurring,
     determiner,
@@ -214,7 +271,7 @@ VALUES
     ref_nomenclatures.get_id_nomenclature('STATUT_BIO', '1'),
     ref_nomenclatures.get_id_nomenclature('NATURALITE', '1'),
     ref_nomenclatures.get_id_nomenclature('PREUVE_EXIST', '0'),
-    ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
+    --ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
     ref_nomenclatures.get_id_nomenclature('STATUT_OBS', 'Pr'),
     ref_nomenclatures.get_id_nomenclature('DEE_FLOU', 'NON'),
     'Gil',
@@ -235,7 +292,7 @@ VALUES
     ref_nomenclatures.get_id_nomenclature('STATUT_BIO', '1') ,
     ref_nomenclatures.get_id_nomenclature('NATURALITE', '1'),
     ref_nomenclatures.get_id_nomenclature('PREUVE_EXIST', '0'),
-    ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
+    --ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
     ref_nomenclatures.get_id_nomenclature('STATUT_OBS', 'Pr'),
     ref_nomenclatures.get_id_nomenclature('DEE_FLOU', 'NON'),
     'Théo',
@@ -256,7 +313,7 @@ VALUES
     ref_nomenclatures.get_id_nomenclature('STATUT_BIO', '1'),
     ref_nomenclatures.get_id_nomenclature('NATURALITE', '1'),
     ref_nomenclatures.get_id_nomenclature('PREUVE_EXIST', '0'),
-    ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
+    --ref_nomenclatures.get_id_nomenclature('NIV_PRECIS', '0'),
     ref_nomenclatures.get_id_nomenclature('STATUT_OBS', 'Pr'),
     ref_nomenclatures.get_id_nomenclature('DEE_FLOU', 'NON'),
   'Donovan',

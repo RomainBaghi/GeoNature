@@ -20,6 +20,7 @@ from geonature.utils.env import (
     ROOT_DIR,
     GN_MODULE_FE_FILE,
     load_config,
+    get_config_file_path,
     DB,
     GN_EXTERNAL_MODULE,
 )
@@ -73,7 +74,11 @@ def build_geonature_front(rebuild_sass=False):
 def frontend_routes_templating(app=None):
     if not app:
         app = get_app_for_cmd(with_external_mods=False)
+
     log.info("Generating frontend routing")
+    # recuperation de la configuration
+    configs_gn = load_config(get_config_file_path())
+
     from geonature.utils.env import list_frontend_enabled_modules
 
     with open(
@@ -94,7 +99,13 @@ def frontend_routes_templating(app=None):
 
             # TODO test if two modules with the same name is okay for Angular
 
-        route_template = template.render(routes=routes)
+        route_template = template.render(
+            routes=routes,
+            enable_user_management=configs_gn["ACCOUNT_MANAGEMENT"].get(
+                "ENABLE_USER_MANAGEMENT"
+            ),
+            enable_sign_up=configs_gn["ACCOUNT_MANAGEMENT"].get("ENABLE_SIGN_UP"),
+        )
 
         with open(
             str(ROOT_DIR / "frontend/src/app/routing/app-routing.module.ts"), "w"
@@ -114,6 +125,39 @@ def tsconfig_templating():
         output_file.write(tsconfig_templated)
     log.info("...%s\n", MSG_OK)
 
+
+def tsconfig_app_templating(app=None):
+    if not app:
+        app = get_app_for_cmd(with_external_mods=False)
+    log.info('Generating tsconfig.app.json')
+    from geonature.utils.env import list_frontend_enabled_modules
+    with open(
+        str(ROOT_DIR / 'frontend/src/tsconfig.app.json.sample'),
+        'r'
+    ) as input_file:
+        template = Template(input_file.read())
+        routes = []
+        for url_path, module_code in list_frontend_enabled_modules(app):
+            location = Path(GN_EXTERNAL_MODULE / module_code.lower())
+
+            # test if module have frontend
+            if (location / 'frontend').is_dir():
+                location = '{}/frontend/app'.format(location)
+                routes.append(
+                    {'location': location}
+                )
+
+            # TODO test if two modules with the same name is okay for Angular
+
+        route_template = template.render(routes=routes)
+
+        with open(
+            str(ROOT_DIR / 'frontend/src/tsconfig.app.json'), 'w'
+        ) as output_file:
+            output_file.write(route_template)
+
+    log.info("...%s\n", MSG_OK)
+    
 
 def create_frontend_config(conf_file):
     log.info("Generating configuration")

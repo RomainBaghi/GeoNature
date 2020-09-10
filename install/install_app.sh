@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# make nvm available
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 OS_BITS="$(getconf LONG_BIT)"
 
 # test the server architecture
@@ -98,13 +103,30 @@ fi
 
 if [[ $python_path ]]; then
   echo "Installation du virtual env..."
-  virtualenv -p $python_path venv
+  python3 -m virtualenv -p $python_path venv
 else
-  virtualenv venv
+  python3 -m virtualenv venv
 fi
+
+
+echo "Ajout de l'autocomplétion de la commande GeoNature au virtual env..."
+readonly bin_venv_dir="${BASE_DIR}/backend/venv/bin/"
+readonly activate_file="${bin_venv_dir}/activate"
+readonly assets_install_dir="${BASE_DIR}/install/assets"
+readonly src_completion_file="${assets_install_dir}/geonature_bash_completion.sh"
+readonly completion_file_name="geonature_completion"
+readonly completion_code="\n# GeoNature command completion\nsource \"\${VIRTUAL_ENV}/bin/${completion_file_name}\""
+if ! grep -q "${completion_code}" "${activate_file}" ; then
+    cp "${src_completion_file}" "${bin_venv_dir}/${completion_file_name}"
+    cp "${activate_file}" "${activate_file}.save-$(date +'%F')"
+    echo -e "${completion_code}" >> "${activate_file}"
+fi
+
 
 echo "Activation du virtual env..."
 source venv/bin/activate
+
+
 echo "Installation des dépendances Python..."
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -112,25 +134,35 @@ if [[ $MODE == "dev" ]]
 then
   pip install -r requirements-dev.txt
 fi
+
+
 echo "Création des commandes 'geonature'..."
 python ${BASE_DIR}/geonature_cmd.py install_command
 echo "Création de la configuration du frontend depuis 'config/geonature_config.toml'..."
 geonature generate_frontend_config --conf-file ${BASE_DIR}/config/geonature_config.toml --build=false
 
-# Lancement de l'application
-echo "Configuration de l'application api backend dans supervisor..."
+
+echo "Création du fichier de log des erreurs GeoNature"
+# Cela évite sa création par Supervisor avec des droits root
+# Voir : https://github.com/Supervisor/supervisor/issues/123
+touch "${BASE_DIR}/var/log/gn_errors.log"
+
+
+# Store path to backend directory
 DIR=$(readlink -e "${0%/*}")
-cp gunicorn_start.sh.sample gunicorn_start.sh
-sudo -s sed -i "s%APP_PATH%${BASE_DIR}%" gunicorn_start.sh
-sudo -s cp geonature-service.conf /etc/supervisor/conf.d/
-sudo -s sed -i "s%APP_PATH%${DIR}%" /etc/supervisor/conf.d/geonature-service.conf
-sudo -s sed -i "s%ROOT_DIR%${BASE_DIR}%" /etc/supervisor/conf.d/geonature-service.conf
 
+echo "Création de la rotation des logs à l'aide de Logrotate"
+sudo cp "${assets_install_dir}/log_rotate" "/etc/logrotate.d/geonature"
+sudo -s sed -i "s%{{APP_PATH}}%${BASE_DIR}%" "/etc/logrotate.d/geonature"
+sudo -s sed -i "s%{{USER}}%${USER:=$(/usr/bin/id -run)}%" "/etc/logrotate.d/geonature"
+sudo -s sed -i "s%{{GROUP}}%${USER}%" "/etc/logrotate.d/geonature"
+sudo logrotate -f "/etc/logrotate.conf"
 
-#création d'un fichier rotation des logs
-sudo cp $DIR/log_rotate /etc/logrotate.d/geonature
-sudo -s sed -i "s%APP_PATH%${BASE_DIR}%" /etc/logrotate.d/geonature
-sudo logrotate -f /etc/logrotate.conf
+echo "Configuration de l'application api backend dans Supervisor..."
+sudo -s cp "${assets_install_dir}/geonature-service.conf" "/etc/supervisor/conf.d/"
+sudo -s sed -i "s%{{APP_PATH}}%${DIR}%" "/etc/supervisor/conf.d/geonature-service.conf"
+sudo -s sed -i "s%{{ROOT_DIR}}%${BASE_DIR}%" "/etc/supervisor/conf.d/geonature-service.conf"
+sudo -s sed -i "s%{{USER}}%${USER}%" "/etc/supervisor/conf.d/geonature-service.conf"
 
 echo "Lancement de l'application api backend..."
 sudo -s supervisorctl reread
@@ -138,30 +170,29 @@ sudo -s supervisorctl reload
 
 
 # Frontend installation
-# Node and npm installation
-echo "Installation de npm"
+echo "Installation de Node et Npm"
 cd ../frontend
-wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
- [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm install 8.1.1
+nvm install
+nvm use
 
 echo " ############"
-echo "Installation des paquets npm"
-npm install --only=prod
+echo "Installation des paquets Npm"
+npm ci --only=prod
 
-# lien symbolique vers le dossier static du backend (pour le backoffice)
-ln -s ${BASE_DIR}/frontend/node_modules ${BASE_DIR}/backend/static
+
+# Lien symbolique vers le dossier static du backend (pour le backoffice)
+ln -s "${BASE_DIR}/frontend/node_modules" "${BASE_DIR}/backend/static"
+
 
 # Creation du dossier des assets externes
-mkdir src/external_assets
+mkdir "src/external_assets"
+
 
 # Copy the custom components
 echo "Création des fichiers de customisation du frontend..."
 if [ ! -f src/custom/custom.scss ]; then
   cp src/custom/custom.scss.sample src/custom/custom.scss
 fi
-
 if [ ! -f src/custom/components/footer/footer.component.ts ]; then
   cp src/custom/components/footer/footer.component.ts.sample src/custom/components/footer/footer.component.ts
 fi
@@ -176,23 +207,36 @@ if [ ! -f src/custom/components/introduction/introduction.component.html ]; then
 fi
 
 
-# Generate the tsconfig.json 
+# Generate the tsconfig.json
 geonature generate_frontend_tsconfig
+# Generate the src/tsconfig.app.json
+geonature generate_frontend_tsconfig_app
 # Generate the modules routing file by templating
-geonature generate_frontend_modules_route  
+geonature generate_frontend_modules_route
 
 # Retour à la racine de GeoNature
 cd ../
 my_current_geonature_directory=$(pwd)
 
-# Installation du module Occtax
-source backend/venv/bin/activate
+# Installation du module Occtax et OccHab
 geonature install_gn_module $my_current_geonature_directory/contrib/occtax /occtax --build=false
+
+if [ "$install_module_occhab" = true ];
+  then
+  geonature install_gn_module $my_current_geonature_directory/contrib/gn_module_occhab /occhab --build=false
+fi
 
 if [ "$install_module_validation" = true ];
   then
     geonature install_gn_module $my_current_geonature_directory/contrib/gn_module_validation /validation --build=false
-  fi
+fi
+
+echo "Désactiver le virtual env"
+deactivate
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
 if [[ $MODE != "dev" ]]
@@ -202,7 +246,3 @@ then
   npm rebuild node-sass --force
   npm run build
 fi
-
-
-echo "Désactiver le virtual env"
-deactivate

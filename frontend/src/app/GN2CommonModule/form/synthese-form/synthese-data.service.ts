@@ -43,10 +43,11 @@ export class SyntheseDataService {
     }
     return queryUrl;
   }
+
   getSyntheseData(params) {
-    return this._api.get<any>(`${AppConfig.API_ENDPOINT}/synthese/for_web`, {
-      params: this.buildQueryUrl(params)
-    });
+    return this._api.post<any>(`${AppConfig.API_ENDPOINT}/synthese/for_web`,
+      params
+    );
   }
 
   getSyntheseGeneralStat() {
@@ -87,6 +88,22 @@ export class SyntheseDataService {
     );
 
     this.subscribeAndDownload(source, 'synthese_observations', format);
+  }
+
+  downloadTaxons(idSyntheseList: Array<number>, format: string, filename: string) {
+    this.isDownloading = true;
+
+    const source = this._api.post(
+      `${AppConfig.API_ENDPOINT}/synthese/export_taxons`,
+      idSyntheseList,
+      {
+        headers: new HttpHeaders().set('Content-Type', 'application/json'),
+        observe: 'events',
+        responseType: 'blob',
+        reportProgress: true
+      });
+
+    this.subscribeAndDownload(source, filename, format);
   }
 
   downloadStatusOrMetadata(url: string, format: string, queryString: HttpParams, filename: string) {

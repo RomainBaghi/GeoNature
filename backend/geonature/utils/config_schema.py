@@ -4,8 +4,14 @@
 
 import os
 
-from marshmallow import Schema, fields, validates_schema, ValidationError
-from marshmallow.validate import OneOf, Regexp
+from marshmallow import (
+    Schema,
+    fields,
+    validates_schema,
+    ValidationError,
+    post_load,
+)
+from marshmallow.validate import OneOf, Regexp, Email
 from geonature.core.gn_synthese.synthese_config import (
     DEFAULT_EXPORT_COLUMNS,
     DEFAULT_LIST_COLUMN,
@@ -32,6 +38,10 @@ class CasSchemaConf(Schema):
     )
     CAS_USER_WS = fields.Nested(CasUserSchemaConf, missing=dict())
     USERS_CAN_SEE_ORGANISM_DATA = fields.Boolean(missing=False)
+    # Quel modules seront associés au JDD récupérés depuis MTD
+    JDD_MODULE_CODE_ASSOCIATION = fields.List(
+        fields.String, missing=["OCCTAX", "OCCHAB"]
+    )
 
 
 class BddConfig(Schema):
@@ -57,22 +67,50 @@ class MailConfig(Schema):
     MAIL_DEFAULT_SENDER = fields.String(missing=None)
     MAIL_MAX_EMAILS = fields.Integer(missing=None)
     MAIL_ASCII_ATTACHMENTS = fields.Boolean(missing=False)
-
     ERROR_MAIL_TO = fields.List(fields.String(), missing=list())
 
 
+class AccountManagement(Schema):
+    # config liée à l'incription
+    ENABLE_SIGN_UP = fields.Boolean(missing=False)
+    ENABLE_USER_MANAGEMENT = fields.Boolean(missing=False)
+    AUTO_ACCOUNT_CREATION = fields.Boolean(missing=True)
+    AUTO_DATASET_CREATION = fields.Boolean(missing=True)
+    VALIDATOR_EMAIL = fields.Email()
+    ACCOUNT_FORM = fields.List(fields.Dict(), missing=[])
+
+
+class UsersHubConfig(Schema):
+    ADMIN_APPLICATION_LOGIN = fields.String()
+    ADMIN_APPLICATION_PASSWORD = fields.String()
+    URL_USERSHUB = fields.Url()
+
+
+class ServerConfig(Schema):
+    LOG_LEVEL = fields.Integer(missing=20)
+
+
+class MediasConfig(Schema):
+    MEDIAS_SIZE_MAX = fields.Integer(missing=50000)
+
+
+class MetadataConfig(Schema):
+    NB_AF_DISPLAYED = fields.Integer(missing=50, validate=OneOf([10, 25, 50, 100]))
+
+
 # class a utiliser pour les paramètres que l'on ne veut pas passer au frontend
+
+
 class GnPySchemaConf(Schema):
     SQLALCHEMY_DATABASE_URI = fields.String(
         required=True,
         validate=Regexp(
             "^postgresql:\/\/.*:.*@[^:]+:\w+\/\w+$",
             0,
-            """Database uri is invalid ex:
-             postgresql://monuser:monpass@server:port/db_name""",
+            "Database uri is invalid ex: postgresql://monuser:monpass@server:port/db_name",
         ),
     )
-    SQLALCHEMY_TRACK_MODIFICATIONS = fields.Boolean(missing=False)
+    SQLALCHEMY_TRACK_MODIFICATIONS = fields.Boolean(missing=True)
     SESSION_TYPE = fields.String(missing="filesystem")
     SECRET_KEY = fields.String(required=True)
     # le cookie expire toute les 7 jours par défaut
@@ -89,6 +127,47 @@ class GnPySchemaConf(Schema):
     CAS = fields.Nested(CasSchemaConf, missing=dict())
     MAIL_ON_ERROR = fields.Boolean(missing=False)
     MAIL_CONFIG = fields.Nested(MailConfig, missing=None)
+    ADMIN_APPLICATION_LOGIN = fields.String()
+    ACCOUNT_MANAGEMENT = fields.Nested(AccountManagement, missing={})
+    USERSHUB = fields.Nested(UsersHubConfig, missing={})
+    SERVER = fields.Nested(ServerConfig, missing={})
+    MEDIAS = fields.Nested(MediasConfig, missing={})
+
+    @post_load()
+    def unwrap_usershub(self, data):
+        """
+            On met la section [USERSHUB] à la racine de la conf
+            pour compatibilité et simplicité ave le sous-module d'authentif
+        """
+        for key, value in data["USERSHUB"].items():
+            data[key] = value
+        data.pop("USERSHUB")
+        return data
+
+    @validates_schema
+    def validate_enable_usershub_and_mail(self, data):
+        # si account management = true, URL_USERSHUB et MAIL_CONFIG sont necessaire
+        if data["ACCOUNT_MANAGEMENT"].get("ENABLE_SIGN_UP", False) or data[
+            "ACCOUNT_MANAGEMENT"
+        ].get("ENABLE_USER_MANAGEMENT", False):
+            if (
+                data["USERSHUB"].get("URL_USERSHUB", None) is None
+                or data["USERSHUB"].get("ADMIN_APPLICATION_LOGIN", None) is None
+                or data["USERSHUB"].get("ADMIN_APPLICATION_PASSWORD", None) is None
+            ):
+                raise ValidationError(
+                    "URL_USERSHUB, ADMIN_APPLICATION_LOGIN et ADMIN_APPLICATION_PASSWORD sont necessaires si ENABLE_SIGN_UP=True",
+                    "URL_USERSHUB",
+                )
+            if (
+                data["MAIL_CONFIG"].get("MAIL_SERVER", None) is None
+                or data["MAIL_CONFIG"].get("MAIL_USERNAME", None) is None
+                or data["MAIL_CONFIG"].get("MAIL_PASSWORD", None) is None
+            ):
+                raise ValidationError(
+                    "Veuillez remplir la rubrique MAIL_CONFIG si ENABLE_SIGN_UP=True",
+                    "ENABLE_SIGN_UP",
+                )
 
 
 class GnFrontEndConf(Schema):
@@ -141,6 +220,10 @@ class Synthese(Schema):
     DISPLAY_TAXON_TREE = fields.Boolean(missing=True)
     # rajoute le filtre sur l'observers_txt en ILIKE sur les portée 1 et 2 du CRUVED
     CRUVED_SEARCH_WITH_OBSERVER_AS_TXT = fields.Boolean(missing=False)
+    # Switch the observer form input in free text input (true) or in select input (false)
+    SEARCH_OBSERVER_WITH_LIST = fields.Boolean(missing=False)
+    # id of the observer list -- utilisateurs.t_menus
+    ID_SEARCH_OBSERVER_LIST = fields.Integer(missing=1)
     # Nombre max d'observation à afficher sur la carte
     NB_MAX_OBS_MAP = fields.Integer(missing=50000)
     # clusteriser les layers sur la carte
@@ -159,25 +242,27 @@ cookie_expiration = GnPySchemaConf().load({}).data.get("COOKIE_EXPIRATION")
 BASEMAP = [
     {
         "name": "OpenStreetMap",
-        "layer": "//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-        "attribution": "&copy OpenStreetMap",
+        "url": "//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+        "options": {"attribution": "&copy OpenStreetMap",},
     },
     {
         "name": "OpenTopoMap",
-        "layer": "//a.tile.opentopomap.org/{z}/{x}/{y}.png",
-        "attribution": "© OpenTopoMap",
+        "url": "//a.tile.opentopomap.org/{z}/{x}/{y}.png",
+        "options": {"attribution": "© OpenTopoMap",},
     },
     {
         "name": "GoogleSatellite",
         "layer": "//{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-        "subdomains": ["mt0", "mt1", "mt2", "mt3"],
-        "attribution": "© GoogleMap",
+        "options": {
+            "subdomains": ["mt0", "mt1", "mt2", "mt3"],
+            "attribution": "© GoogleMap",
+        },
     },
 ]
 
 
 class MapConfig(Schema):
-    BASEMAP = fields.List(fields.Dict, missing=BASEMAP)
+    BASEMAP = fields.List(fields.Dict(), missing=BASEMAP)
     CENTER = fields.List(fields.Float, missing=[46.52863469527167, 2.43896484375])
     ZOOM_LEVEL = fields.Integer(missing=6)
     ZOOM_LEVEL_RELEVE = fields.Integer(missing=15)
@@ -189,6 +274,7 @@ class MapConfig(Schema):
 # class a utiliser pour les paramètres que l'on veut passer au frontend
 class GnGeneralSchemaConf(Schema):
     appName = fields.String(missing="GeoNature2")
+    LOGO_STRUCTURE_FILE = fields.String(missing="logo_structure.png")
     GEONATURE_VERSION = fields.String(missing=GEONATURE_VERSION.strip())
     DEFAULT_LANGUAGE = fields.String(missing="fr")
     PASS_METHOD = fields.String(missing="hash", validate=OneOf(["hash", "md5"]))
@@ -208,6 +294,35 @@ class GnGeneralSchemaConf(Schema):
     # Ajoute la surchouche 'taxonomique' sur l'API nomenclature
     ENABLE_NOMENCLATURE_TAXONOMIC_FILTERS = fields.Boolean(missing=True)
     BDD = fields.Nested(BddConfig, missing=dict())
+    URL_USERSHUB = fields.Url(required=False)
+    ACCOUNT_MANAGEMENT = fields.Nested(AccountManagement, missing={})
+    MEDIAS = fields.Nested(MediasConfig, missing={})
+    UPLOAD_FOLDER = fields.String(missing="static/medias")
+    METADATA = fields.Nested(MetadataConfig, missing={})
+
+    @validates_schema
+    def validate_enable_sign_up(self, data):
+        # si CAS_PUBLIC = true and ENABLE_SIGN_UP = true
+        if data.get("CAS_PUBLIC").get("CAS_AUTHENTIFICATION") and (
+            data["ACCOUNT_MANAGEMENT"].get("ENABLE_SIGN_UP", False)
+            or data["ACCOUNT_MANAGEMENT"].get("ENABLE_USER_MANAGEMENT", False)
+        ):
+            raise ValidationError(
+                "CAS_PUBLIC et ENABLE_SIGN_UP ou ENABLE_USER_MANAGEMENT ne peuvent être activés ensemble",
+                "ENABLE_SIGN_UP, ENABLE_USER_MANAGEMENT",
+            )
+
+    @validates_schema
+    def validate_account_autovalidation(self, data):
+        account_config = data.get("ACCOUNT_MANAGEMENT")
+        if (
+            not account_config.get("AUTO_ACCOUNT_CREATION", False)
+            and account_config.get("VALIDATOR_EMAIL", None) is None
+        ):
+            raise ValidationError(
+                "Si AUTO_ACCOUNT_CREATION = False, veuillez remplir le paramètre VALIDATOR_EMAIL",
+                "AUTO_ACCOUNT_CREATION, VALIDATOR_EMAIL",
+            )
 
 
 class ManifestSchemaConf(Schema):

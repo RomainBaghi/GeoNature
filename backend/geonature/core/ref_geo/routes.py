@@ -2,7 +2,7 @@ from flask import Blueprint, request, current_app
 from sqlalchemy.sql import text
 
 from geonature.utils.env import DB
-from geonature.utils.utilssqlalchemy import json_resp
+from utils_flask_sqla.response import json_resp
 from geonature.core.ref_geo.models import BibAreasTypes, LiMunicipalities, LAreas
 
 routes = Blueprint("ref_geo", __name__)
@@ -19,13 +19,11 @@ def getGeoInfo():
     data = dict(request.get_json())
     sql = text(
         """SELECT (ref_geo.fct_get_area_intersection(
-        st_setsrid(ST_GeomFromGeoJSON(:geom),4326), :id_area_municipality)).*"""
+        st_setsrid(ST_GeomFromGeoJSON(:geom),4326), :id_type)).*"""
     )
     try:
         result = DB.engine.execute(
-            sql,
-            geom=str(data["geometry"]),
-            id_area_municipality=current_app.config["BDD"]["id_area_type_municipality"],
+            sql, geom=str(data["geometry"]), id_type=data.get("id_type", None),
         )
     except Exception as e:
         DB.session.rollback()
@@ -56,7 +54,34 @@ def getGeoInfo():
     for row in result:
         alt = {"altitude_min": row[0], "altitude_max": row[1]}
 
-    return {"municipality": municipality, "altitude": alt}
+    return {"areas": municipality, "altitude": alt}
+
+
+@routes.route("/altitude", methods=["POST"])
+@json_resp
+def getaltitide():
+    """
+    From a posted geojson get the altitude min/max
+
+    .. :quickref: Ref Geo;
+    """
+    data = dict(request.get_json())
+
+    sql = text(
+        """SELECT (ref_geo.fct_get_altitude_intersection(
+        st_setsrid(ST_GeomFromGeoJSON(:geom),4326))).*
+        """
+    )
+    try:
+        result = DB.engine.execute(sql, geom=str(data["geometry"]))
+    except Exception as e:
+        DB.session.rollback()
+        raise
+    alt = {}
+    for row in result:
+        alt = {"altitude_min": row[0], "altitude_max": row[1]}
+
+    return alt
 
 
 @routes.route("/areas", methods=["POST"])
@@ -158,3 +183,39 @@ def get_areas():
     data = q.limit(limit)
     return [d.as_dict() for d in data]
 
+
+@routes.route("/area_size", methods=["Post"])
+@json_resp
+def get_area_size():
+    """
+        Return the area size from a given geojson
+
+        .. :quickref: Ref Geo;
+
+        :returns: An area size (int)
+    """
+
+    geojson = dict(request.get_json())
+    query = text(
+        """
+    SELECT
+    ST_Area(
+        ST_Transform(
+            ST_SetSrid(
+                ST_GeomFromGeoJSON(:geojson), 4326
+            ),:local_srid
+        )
+    )
+    """
+    )
+
+    result = DB.engine.execute(
+        query,
+        geojson=str(geojson["geometry"]),
+        local_srid=current_app.config["LOCAL_SRID"],
+    )
+    area = None
+    if result:
+        for r in result:
+            return r[0]
+    return None
